@@ -9,8 +9,14 @@ import (
 	"goji.io/pat"
 )
 
-// Hi ...
-func Hi(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+// PubHandler ...
+type PubHandler struct {
+	ChannelSecret string
+	AccessToken   string
+}
+
+// ToSQS ...
+func (p *PubHandler) ToSQS(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 	name := pat.Param(ctx, "name")
 	fmt.Fprintf(w, "Hi %s", name)
 }

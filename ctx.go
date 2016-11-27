@@ -4,6 +4,9 @@ import "github.com/Sirupsen/logrus"
 
 // Ctx ...
 type Ctx struct {
+	AppName       string
+	channelSecret string
+	accessToken   string
 	*config
 	*logger
 }

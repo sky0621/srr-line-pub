@@ -1,6 +1,4 @@
 app_name = "srr-line-pub"
-channel_secret = "<Your LINE Channel Secret>"
-access_token = "<Your LINE Access Token>"
 
 [server]
 host = "example.com"

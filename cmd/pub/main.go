@@ -1,13 +1,12 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 
-	goji "goji.io"
-	"goji.io/pat"
+	"github.com/zenazn/goji"
 
 	"github.com/fsnotify/fsnotify"
 	pub "github.com/sky0621/srr-line-pub"
@@ -38,11 +37,20 @@ func realMain() (exitCode int) {
 }
 
 func wrappedMain() (exitCode int) {
+	s := flag.String("s", "ChannelSecret", "ChannelSecret")
+	t := flag.String("t", "AccessToken", "AccessToken")
+	flag.Parse()
+
 	setConfig()
 
-	mux := goji.NewMux()
-	mux.HandleFuncC(pat.Get("/hi/:name"), pub.Hi)
-	http.ListenAndServe(":7171", mux)
+	h := &pub.PubHandler{
+		ChannelSecret: *s,
+		AccessToken:   *t,
+	}
+
+	goji.Get("srr/linebot/", h)
+	goji.Serve()
+	// http.ListenAndServe(":7171", mux)
 
 	return exitCode
 }
