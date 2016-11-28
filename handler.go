@@ -5,8 +5,6 @@ import (
 	"net/http"
 
 	"golang.org/x/net/context"
-
-	"goji.io/pat"
 )
 
 // PubHandler ...
@@ -15,8 +13,16 @@ type PubHandler struct {
 	AccessToken   string
 }
 
-// ToSQS ...
-func (p *PubHandler) ToSQS(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-	name := pat.Param(ctx, "name")
-	fmt.Fprintf(w, "Hi %s", name)
+// NewPubHandler ...
+func NewPubHandler(channelSecret string, accessToken string) *PubHandler {
+	h := &PubHandler{
+		ChannelSecret: channelSecret,
+		AccessToken:   accessToken,
+	}
+	return h
+}
+
+// ServeHTTPC ...
+func (p *PubHandler) ServeHTTPC(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Hello!")
 }

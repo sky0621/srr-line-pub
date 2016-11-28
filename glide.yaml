@@ -1,0 +1,12 @@
+package: github.com/sky0621/srr-line-pub
+import:
+- package: github.com/BurntSushi/toml
+- package: github.com/Sirupsen/logrus
+- package: github.com/fsnotify/fsnotify
+- package: github.com/spf13/viper
+- package: goji.io
+  subpackages:
+  - pat
+- package: golang.org/x/net
+  subpackages:
+  - context

@@ -4,9 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
-	"github.com/zenazn/goji"
+	goji "goji.io"
+
+	"goji.io/pat"
 
 	"github.com/fsnotify/fsnotify"
 	pub "github.com/sky0621/srr-line-pub"
@@ -37,24 +40,24 @@ func realMain() (exitCode int) {
 }
 
 func wrappedMain() (exitCode int) {
-	s := flag.String("s", "ChannelSecret", "ChannelSecret")
-	t := flag.String("t", "AccessToken", "AccessToken")
-	flag.Parse()
-
-	setConfig()
-
-	h := &pub.PubHandler{
-		ChannelSecret: *s,
-		AccessToken:   *t,
-	}
-
-	goji.Get("srr/linebot/", h)
-	goji.Serve()
-	// http.ListenAndServe(":7171", mux)
+	s, t := parseFlag()
+	setConfig() // FIXME flagからtomlのパスを読む（無しなら「.」カレント）ようにする
+	// FIXME ミドルウェアを検討
+	mux := goji.NewMux()
+	mux.HandleC(pat.Post("/srr/linebot/"), pub.NewPubHandler(*s, *t))
+	http.ListenAndServe(":7171", mux) // FIXME tomlから読む
 
 	return exitCode
 }
 
+func parseFlag() (s *string, t *string) {
+	s = flag.String("s", "ChannelSecret", "ChannelSecret")
+	t = flag.String("t", "AccessToken", "AccessToken")
+	flag.Parse()
+	return
+}
+
+// FIXME Viperから構造体への変換タイミングは要検討
 func setConfig() {
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
