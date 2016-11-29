@@ -1,12 +1,12 @@
 hash: a096a826a5d34eb6bf5d961b29e0ed4e1cfc6e0d84eb274ed2796ce3b3184a68
-updated: 2016-11-29T07:04:25.6861946+09:00
+updated: 2016-11-30T06:22:52.1199481+09:00
 imports:
 - name: github.com/BurntSushi/toml
   version: bbd5bb678321a0d6e58f1099321dfa73391c1b6f
 - name: github.com/fsnotify/fsnotify
   version: fd9ec7deca8bf46ecd2a795baaacf2b3a9be1197
 - name: github.com/hashicorp/hcl
-  version: 7cb7455c285ca3bf3362aa4ba6a06a6d6f5c3ba0
+  version: 5550aaba7896ad2a161888b40954bc0f0787bb81
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -49,11 +49,11 @@ imports:
   subpackages:
   - context
 - name: golang.org/x/sys
-  version: 30237cf4eefd639b184d1f2cb77a581ea0be8947
+  version: d5645953809d8b4752afb2c3224b1f1ad73dfa70
   subpackages:
   - unix
 - name: golang.org/x/text
-  version: b01949dc0793a9af5e4cb3fce4d42999e76e8ca1
+  version: 4ea6c073aae78d08c7e95e95aa7f55b888287d6f
   subpackages:
   - transform
   - unicode/norm

@@ -3,8 +3,6 @@ package srrlinepub
 import (
 	"fmt"
 	"net/http"
-
-	"golang.org/x/net/context"
 )
 
 // PubHandler ...
@@ -22,7 +20,7 @@ func NewPubHandler(channelSecret string, accessToken string) *PubHandler {
 	return h
 }
 
-// ServeHTTPC ...
-func (p *PubHandler) ServeHTTPC(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+// ServeHTTP ...
+func (p *PubHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hello!")
 }

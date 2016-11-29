@@ -4,16 +4,15 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 
-	goji "goji.io"
-
-	"goji.io/pat"
-
 	"github.com/fsnotify/fsnotify"
-	pub "github.com/sky0621/srr-line-pub"
 	"github.com/spf13/viper"
+	"github.com/zenazn/goji"
+	"github.com/zenazn/goji/web"
+	"github.com/zenazn/goji/web/middleware"
+
+	pub "github.com/sky0621/srr-line-pub"
 )
 
 // flagでconfig.tomlのパスを取得
@@ -42,10 +41,17 @@ func realMain() (exitCode int) {
 func wrappedMain() (exitCode int) {
 	s, t := parseFlag()
 	setConfig() // FIXME flagからtomlのパスを読む（無しなら「.」カレント）ようにする
+
 	// FIXME ミドルウェアを検討
-	mux := goji.NewMux()
-	mux.HandleC(pat.Post("/srr/linebot/"), pub.NewPubHandler(*s, *t))
-	http.ListenAndServe(":7171", mux) // FIXME tomlから読む
+	mux := web.New()
+	mux.Use(middleware.SubRouter)
+	goji.Handle("srr/linebot/*", mux)
+	mux.Post("/", pub.NewPubHandler(*s, *t))
+
+	// FIXME うまく動かない・・・。Echoに変えるかな・・・。
+
+	flag.Set("bind", viper.GetString("server.port"))
+	goji.Serve()
 
 	return exitCode
 }
