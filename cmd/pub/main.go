@@ -9,8 +9,6 @@ import (
 	"github.com/labstack/echo/middleware"
 	"github.com/line/line-bot-sdk-go/linebot"
 
-	"github.com/aws/aws-sdk-go/service/sqs"
-
 	pub "github.com/sky0621/srr-line-pub"
 )
 
@@ -46,7 +44,7 @@ func main() {
 		}
 
 		for _, event := range events {
-			&sqs.
+			// &sqs.
 		}
 
 		// FIXME events を処理する。
