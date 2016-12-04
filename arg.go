@@ -1,20 +1,22 @@
 package pub
 
 // NewArg ...
-func NewArg(lineChannelSecret string, lineAccessToken string, awsAccessKeyID string, awsSecretAccessKey string) *Arg {
+func NewArg(configFilePath, awsAccessKeyID, awsSecretAccessKey, lineChannelSecret, lineAccessToken string) *Arg {
 	a := &Arg{
-		LineChannelSecret:  lineChannelSecret,
-		LineAccessToken:    lineAccessToken,
+		ConfigFilePath:     configFilePath,
 		AwsAccessKeyID:     awsAccessKeyID,
 		AwsSecretAccessKey: awsSecretAccessKey,
+		LineChannelSecret:  lineChannelSecret,
+		LineAccessToken:    lineAccessToken,
 	}
 	return a
 }
 
 // Arg ...
 type Arg struct {
-	LineChannelSecret  string
-	LineAccessToken    string
+	ConfigFilePath     string
 	AwsAccessKeyID     string
 	AwsSecretAccessKey string
+	LineChannelSecret  string
+	LineAccessToken    string
 }

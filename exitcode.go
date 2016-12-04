@@ -1,10 +1,7 @@
 package pub
 
-// ExitCode ...
-type ExitCode int
-
 const (
-	ExitCodeOK ExitCode = iota
+	ExitCodeOK int = iota + 1
 	ExitCodeArgsError
 	ExitCodeLogSetupError
 	ExitCodeConfigError

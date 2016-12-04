@@ -1,9 +1,14 @@
 app_name = "srr-line-pub"
 
 [server]
-host = "example.com"
-port = ":8080"
+host = "localhost"  # your server
+port = ":8080"  # your server port
 
 [logger]
-filepath = "srr-line-pub.log"
+filepath = "srr-line-pub.log" # log file fullpath
 log_level = "debug" # debug, info, warning, error, fatal
+
+[aws]
+[aws.sqs]
+region = "ap-northeast-1" # アジアパシフィック (東京)
+queue_url = "https://sqs.ap-northeast-1.amazonaws.com/065886101085/sri-line-message"
