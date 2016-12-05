@@ -1,7 +1,5 @@
 package pub
 
-import "fmt"
-
 // AppIF ...
 type AppIF interface {
 	Start(arg *Arg) int
@@ -9,23 +7,31 @@ type AppIF interface {
 
 // App ...
 type App struct {
-	Arg Arg
+	logger *logger
 }
 
 // NewApp ...
 func NewApp(arg *Arg) (*App, int) {
-	// FIXME config.tomlのパース
 	config, err := newConfig(arg)
 	if err != nil {
-
+		return nil, ExitCodeConfigError
 	}
-	fmt.Println(config)
 
-	// FIXME loggerのセッティング
+	logger, err := newLogger(config)
+	if err != nil {
+		return nil, ExitCodeLogSetupError
+	}
+	defer logger.close()
+
 	// FIXME AWS接続のセッティング
+
 	// FIXME LINE接続のセッティング
+
 	// FIXME Ctxへの詰め込み
-	app := &App{}
+
+	app := &App{
+		logger: logger,
+	}
 	return app, ExitCodeOK
 }
 

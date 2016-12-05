@@ -51,7 +51,9 @@ func newConfig(arg *Arg) (*config, error) {
 	}
 	cfg.awsConfig.awsAccessKeyID = arg.AwsAccessKeyID
 	cfg.awsConfig.awsSecretAccessKey = arg.AwsSecretAccessKey
-	cfg.lineConfig.channelSecret = arg.LineChannelSecret
-	cfg.lineConfig.accessToken = arg.LineAccessToken
+	cfg.lineConfig = &lineConfig{
+		channelSecret: arg.LineChannelSecret,
+		accessToken:   arg.LineAccessToken,
+	}
 	return &cfg, nil
 }
