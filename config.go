@@ -45,15 +45,15 @@ type lineConfig struct {
 // newConfig ... 設定の取込
 func newConfig(arg *Arg) (*config, error) {
 	var cfg config
-	_, err := toml.DecodeFile(arg.ConfigFilePath, &cfg)
+	_, err := toml.DecodeFile(arg.configFilePath, &cfg)
 	if err != nil {
 		return nil, err
 	}
-	cfg.awsConfig.awsAccessKeyID = arg.AwsAccessKeyID
-	cfg.awsConfig.awsSecretAccessKey = arg.AwsSecretAccessKey
+	cfg.awsConfig.awsAccessKeyID = arg.awsAccessKeyID
+	cfg.awsConfig.awsSecretAccessKey = arg.awsSecretAccessKey
 	cfg.lineConfig = &lineConfig{
-		channelSecret: arg.LineChannelSecret,
-		accessToken:   arg.LineAccessToken,
+		channelSecret: arg.lineChannelSecret,
+		accessToken:   arg.lineAccessToken,
 	}
 	return &cfg, nil
 }
