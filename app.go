@@ -12,10 +12,7 @@ type App struct {
 
 // NewApp ...
 func NewApp(arg *Arg) (*App, int) {
-	config, err := newConfig(arg)
-	if err != nil {
-		return nil, ExitCodeConfigError
-	}
+	config := newConfig(arg)
 
 	logger, err := newLogger(config)
 	if err != nil {

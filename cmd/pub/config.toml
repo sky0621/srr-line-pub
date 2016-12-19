@@ -9,6 +9,6 @@ filepath = "srr-line-pub.log" # log file fullpath
 log_level = "debug" # debug, info, warning, error, fatal
 
 [aws]
-[aws.sqs]
-region = "ap-northeast-1" # アジアパシフィック (東京)
-queue_url = "https://sqs.ap-northeast-1.amazonaws.com/065886101085/sri-line-message"
+  [aws.sqs]
+  region = "ap-northeast-1" # アジアパシフィック (東京)
+  queue_url = "https://sqs.ap-northeast-1.amazonaws.com/065886101085/sri-line-message"

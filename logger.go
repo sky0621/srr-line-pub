@@ -15,26 +15,26 @@ type logger struct {
 // newLogger ...
 func newLogger(c *Config) (*logger, error) {
 	logrusEntry := logrus.WithFields(logrus.Fields{
-		"Host":   c.ServerConfig.Host,
-		"Port":   c.ServerConfig.Port,
+		"Host":   c.ServerHost,
+		"Port":   c.ServerPort,
 		"system": c.AppName,
 	})
 	logrusEntry.Logger.Formatter = new(logrus.TextFormatter)
 	logrusEntry.Logger.Formatter = new(logrus.JSONFormatter) // default
 
-	_, err := os.Stat(c.LogConfig.Filepath)
+	_, err := os.Stat(c.LogFilepath)
 	var logfile *os.File
 	if err == nil {
-		logfile, err = os.OpenFile(c.LogConfig.Filepath, os.O_APPEND, 0666)
+		logfile, err = os.OpenFile(c.LogFilepath, os.O_APPEND, 0666)
 	} else {
-		logfile, err = os.Create(c.LogConfig.Filepath)
+		logfile, err = os.Create(c.LogFilepath)
 	}
 	if err != nil {
 		return nil, err
 	}
 	logrusEntry.Logger.Out = logfile
 
-	level, err := logrus.ParseLevel(c.LogConfig.LogLevel)
+	level, err := logrus.ParseLevel(c.LogLevel)
 	if err != nil {
 		return nil, err
 	}
