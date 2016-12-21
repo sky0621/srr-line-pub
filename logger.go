@@ -19,8 +19,7 @@ func newLogger(c *Config) (*logger, error) {
 		"Port":   c.ServerPort,
 		"system": c.AppName,
 	})
-	logrusEntry.Logger.Formatter = new(logrus.TextFormatter)
-	logrusEntry.Logger.Formatter = new(logrus.JSONFormatter) // default
+	logrusEntry.Logger.Formatter = new(logrus.JSONFormatter)
 
 	_, err := os.Stat(c.LogFilepath)
 	var logfile *os.File

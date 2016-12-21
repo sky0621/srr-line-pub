@@ -1,17 +1,23 @@
 package pub
 
+import (
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/sqs"
+)
+
 // AppIF ...
 type AppIF interface {
-	Start(arg *Arg) int
+	Start() int
 }
 
 // App ...
 type App struct {
 	logger *logger
+	config *Config
 }
 
 // NewApp ...
-func NewApp(arg *Arg) (*App, int) {
+func NewApp(arg *Arg) (AppIF, int) {
 	config := newConfig(arg)
 
 	logger, err := newLogger(config)
@@ -28,12 +34,14 @@ func NewApp(arg *Arg) (*App, int) {
 
 	app := &App{
 		logger: logger,
+		config: config,
 	}
 	return app, ExitCodeOK
 }
 
 // Start ...
 func (a *App) Start() int {
+	sqs.New(&aws.Config{Region: aws.String(a.config.SqsRegion)})
 
 	// e := echo.New()
 	// e.Use(middleware.Logger())
