@@ -5,6 +5,9 @@ const (
 	ExitCodeArgsError
 	ExitCodeLogSetupError
 	ExitCodeConfigError
+	ExitCodeAwsSettingError
+	ExitCodeLineSettingError
+	ExitCodeServerStartError
 	ExitCodeError
 	ExitCodePanic
 )

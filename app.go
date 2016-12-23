@@ -2,71 +2,68 @@ package pub
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"github.com/line/line-bot-sdk-go/linebot"
+	"github.com/uber-go/zap"
 )
-
-// AppIF ...
-type AppIF interface {
-	Start() int
-}
 
 // App ...
 type App struct {
-	logger *logger
-	config *Config
+	ctx *ctx
 }
 
 // NewApp ...
-func NewApp(arg *Arg) (AppIF, int) {
+func NewApp(arg *Arg) (*App, int) {
 	config := newConfig(arg)
 
-	logger, err := newLogger(config)
+	logger, err := newAppLogger(config)
 	if err != nil {
 		return nil, ExitCodeLogSetupError
 	}
-	defer logger.close()
 
-	// FIXME AWS接続のセッティング
+	// AWS接続のセッティング
+	sess, err := session.NewSession(&aws.Config{Region: aws.String(config.SqsRegion)})
+	if err != nil {
+		logger.entry.Error("error: %#v", zap.Error(err))
+		return nil, ExitCodeAwsSettingError
+	}
 
-	// FIXME LINE接続のセッティング
-
-	// FIXME Ctxへの詰め込み
+	// LINE接続のセッティング
+	lineCli, err := linebot.New(config.LineChannelSecret, config.LineAccessToken)
+	if err != nil {
+		logger.entry.Error("error: %#v", zap.Error(err))
+		return nil, ExitCodeLineSettingError
+	}
 
 	app := &App{
-		logger: logger,
-		config: config,
+		ctx: &ctx{
+			logger:     logger,
+			config:     config,
+			awsSession: sess,
+			lineCli:    lineCli,
+		},
 	}
 	return app, ExitCodeOK
 }
 
 // Start ...
 func (a *App) Start() int {
-	sqs.New(&aws.Config{Region: aws.String(a.config.SqsRegion)})
+	sqs.New(a.ctx.awsSession)
 
-	// e := echo.New()
-	// e.Use(middleware.Logger())
-	//
-	// e.POST("/", func(c echo.Context) error {
-	// 	bot, err := linebot.New(&ls, &lt)
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 		return
-	// 	}
-	// 	events, err := bot.ParseRequest(c.Request())
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 		return
-	// 	}
-	//
-	// 	for _, event := range events {
-	// 		// &sqs.
-	// 	}
-	//
-	// 	// FIXME events を処理する。
-	// 	// FIXME aws-sdk-go/sqs にてキューに投入
-	//
-	// 	return c.JSON(http.StatusOK, interface{})
-	// })
+	e := echo.New()
+	e.Use(middleware.Logger())
+
+	handler := &webHandler{ctx: a.ctx}
+	e.POST("/srr/webhook", handler.HandlerFunc)
+
+	err := e.Start(a.ctx.config.ServerPort)
+	if err != nil {
+		a.ctx.logger.entry.Error("error: %#v", zap.Error(err))
+		return ExitCodeServerStartError
+	}
 
 	return ExitCodeOK
 }

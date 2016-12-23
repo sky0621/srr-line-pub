@@ -1,4 +1,4 @@
 package pub
 
-type AwsClient struct {
+type awsClient struct {
 }
