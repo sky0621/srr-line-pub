@@ -4,19 +4,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/uber-go/zap"
 )
 
 // AppLogger ...
 type AppLogger struct {
 	entry   zap.Logger
-	logfile *os.File
-}
-
-// AppLogger ...
-type AppLogger2 struct {
-	entry   *logrus.Entry
 	logfile *os.File
 }
 
@@ -51,36 +44,6 @@ func jstTimeFormatter(key string) zap.TimeFormatter {
 		jst := time.FixedZone("Asia/Tokyo", 9*60*60)
 		return zap.String(key, t.In(jst).Format(layout))
 	})
-}
-
-// newAppLogger ...
-func newAppLogger2(c *Config) (*AppLogger2, error) {
-	logrusEntry := logrus.WithFields(logrus.Fields{
-		"Host":   c.ServerHost,
-		"Port":   c.ServerPort,
-		"system": c.AppName,
-	})
-	logrusEntry.Logger.Formatter = new(logrus.JSONFormatter)
-
-	_, err := os.Stat(c.LogFilepath)
-	var logfile *os.File
-	if err == nil {
-		logfile, err = os.OpenFile(c.LogFilepath, os.O_APPEND, 0666)
-	} else {
-		logfile, err = os.Create(c.LogFilepath)
-	}
-	if err != nil {
-		return nil, err
-	}
-	logrusEntry.Logger.Out = logfile
-
-	level, err := logrus.ParseLevel(c.LogLevel)
-	if err != nil {
-		return nil, err
-	}
-	logrusEntry.Logger.Level = level
-
-	return &AppLogger2{entry: logrusEntry, logfile: logfile}, nil
 }
 
 // Close ...

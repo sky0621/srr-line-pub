@@ -1,12 +1,18 @@
 package: github.com/sky0621/srr-line-pub
 import:
-- package: github.com/BurntSushi/toml
-- package: github.com/Sirupsen/logrus
-- package: github.com/fsnotify/fsnotify
+- package: github.com/aws/aws-sdk-go
+  version: ^1.6.9
+  subpackages:
+  - aws
+  - aws/session
+  - service/sqs
+- package: github.com/labstack/echo
+  version: ^3.0.3
+  subpackages:
+  - middleware
+- package: github.com/line/line-bot-sdk-go
+  version: ^1.0.0
+  subpackages:
+  - linebot
 - package: github.com/spf13/viper
-- package: goji.io
-  subpackages:
-  - pat
-- package: golang.org/x/net
-  subpackages:
-  - context
+- package: github.com/uber-go/zap
