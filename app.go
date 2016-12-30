@@ -4,8 +4,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
 	"github.com/line/line-bot-sdk-go/linebot"
 	"github.com/uber-go/zap"
 )
@@ -57,15 +55,13 @@ func NewApp(arg *Arg) (*App, int) {
 
 // Start ...
 func (a *App) Start() int {
-	a.ctx.logger.entry.Info("App start")
+	a.ctx.logger.entry.Info("App will start")
 
-	e := echo.New()
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-
+	e := webSetup()
 	handler := &webHandler{ctx: a.ctx}
-	e.POST("/srr/webhook", handler.HandlerFunc)
+	e.POST(a.ctx.config.Line.WebhookUrl, handler.HandlerFunc)
 
+	a.ctx.logger.entry.Info("Server will start", zap.String("port", a.ctx.config.Server.Port))
 	err := e.Start(a.ctx.config.Server.Port)
 	if err != nil {
 		a.ctx.logger.entry.Error("error: %#v", zap.Error(err))
