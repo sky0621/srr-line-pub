@@ -36,7 +36,7 @@ func (h *webHandler) HandlerFunc(c echo.Context) error {
 		if event.Type == linebot.EventTypeMessage {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
-				h.ctx.logger.entry.Debug(fmt.Sprintf("message: %#v", message))
+				h.ctx.logger.entry.Debug(fmt.Sprintf("TextMessage: %#v", message))
 				var newMsg *linebot.TextMessage
 				if "あぶない" == message.Text {
 					newMsg = linebot.NewTextMessage("ばしょをちずでおしえて！")
@@ -66,7 +66,7 @@ func (h *webHandler) HandlerFunc(c echo.Context) error {
 				h.ctx.logger.entry.Debug(fmt.Sprintf("sqsRes %#v", sqsRes))
 
 			case *linebot.LocationMessage:
-				h.ctx.logger.entry.Debug(fmt.Sprintf("message %#v", message))
+				h.ctx.logger.entry.Debug(fmt.Sprintf("LocationMessage %#v", message))
 				lat := message.Latitude
 				lon := message.Longitude
 				addr := message.Address
@@ -93,7 +93,10 @@ func (h *webHandler) HandlerFunc(c echo.Context) error {
 				}
 				h.ctx.logger.entry.Debug(fmt.Sprintf("sqsRes %#v", sqsRes))
 
+			default:
+				h.ctx.logger.entry.Debug(fmt.Sprintf("Other Message %#v", message))
 			}
+
 		}
 
 	}
