@@ -15,12 +15,12 @@ type AppLogger struct {
 
 // newAppLogger ...
 func newAppLogger(c *Config) (*AppLogger, error) {
-	_, err := os.Stat(c.LogFilepath)
+	_, err := os.Stat(c.Logger.Filepath)
 	var logfile *os.File
 	if err == nil {
-		logfile, err = os.OpenFile(c.LogFilepath, os.O_APPEND, 0666)
+		logfile, err = os.OpenFile(c.Logger.Filepath, os.O_APPEND, 0666)
 	} else {
-		logfile, err = os.Create(c.LogFilepath)
+		logfile, err = os.Create(c.Logger.Filepath)
 	}
 	if err != nil {
 		return nil, err
@@ -31,8 +31,8 @@ func newAppLogger(c *Config) (*AppLogger, error) {
 		zap.Output(logfile),
 	)
 	logger.With(
-		zap.String("Host", c.ServerHost),
-		zap.String("Port", c.ServerPort),
+		zap.String("Host", c.Server.Host),
+		zap.String("Port", c.Server.Port),
 		zap.String("System", c.AppName),
 	)
 	return &AppLogger{entry: logger, logfile: logfile}, nil

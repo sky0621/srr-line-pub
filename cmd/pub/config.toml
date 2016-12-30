@@ -11,4 +11,7 @@ log_level = "debug" # debug, info, warning, error, fatal
 [aws]
   [aws.sqs]
   region = "ap-northeast-1" # アジアパシフィック (東京)
-  queue_url = "https://sqs.ap-northeast-1.amazonaws.com/065886101085/sri-line-message"
+  queue_url = "【SQSのURL】"
+
+[line]
+webhook_url = "【LINEのWebhook URL】"

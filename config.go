@@ -12,17 +12,40 @@ import (
 
 // Config ... 設定全体
 type Config struct {
-	AppName            string `toml:"app_name"`
-	ServerHost         string `toml:"server.host"`
-	ServerPort         string `toml:"server.port"`
-	LogFilepath        string `toml:"logger.filepath"`
-	LogLevel           string `toml:"logger.log_level"`
-	AwsAccessKeyID     string
-	AwsSecretAccessKey string
-	SqsRegion          string `toml:"aws.sqs.region"`
-	SqsQueueURL        string `toml:"aws.sqs.queue_url"`
-	LineChannelSecret  string
-	LineAccessToken    string
+	Arg     *Arg
+	AppName string `toml:"app_name"`
+	Server  *ServerConfig
+	Logger  *LoggerConfig
+	Aws     *AwsConfig
+	Line    *LineConfig
+}
+
+// ServerConfig ...
+type ServerConfig struct {
+	Host string `toml:"server.host"`
+	Port string `toml:"server.port"`
+}
+
+// LoggerConfig ...
+type LoggerConfig struct {
+	Filepath string `toml:"logger.filepath"`
+	Level    string `toml:"logger.log_level"`
+}
+
+// AwsConfig ...
+type AwsConfig struct {
+	Sqs *SqsConfig
+}
+
+// SqsConfig ...
+type SqsConfig struct {
+	Region   string `toml:"aws.sqs.region"`
+	QueueURL string `toml:"aws.sqs.queue_url"`
+}
+
+// LineConfig ...
+type LineConfig struct {
+	WebhookUrl string `toml:"line.webhook_url"`
 }
 
 // newConfig ... 設定の取込
@@ -33,16 +56,24 @@ func newConfig(arg *Arg) *Config {
 		panic(fmt.Errorf("設定ファイル読み込みエラー: %s \n", err))
 	}
 	return &Config{
-		AppName:            viper.GetString("app_name"),
-		ServerHost:         viper.GetString("server.host"),
-		ServerPort:         viper.GetString("server.port"),
-		LogFilepath:        viper.GetString("logger.filepath"),
-		LogLevel:           viper.GetString("logger.log_level"),
-		AwsAccessKeyID:     arg.awsAccessKeyID,
-		AwsSecretAccessKey: arg.awsSecretAccessKey,
-		SqsRegion:          viper.GetString("aws.sqs.region"),
-		SqsQueueURL:        viper.GetString("aws.sqs.queue_url"),
-		LineChannelSecret:  arg.lineChannelSecret,
-		LineAccessToken:    arg.lineAccessToken,
+		Arg:     arg,
+		AppName: viper.GetString("app_name"),
+		Server: &ServerConfig{
+			Host: viper.GetString("server.host"),
+			Port: viper.GetString("server.port"),
+		},
+		Logger: &LoggerConfig{
+			Filepath: viper.GetString("logger.filepath"),
+			Level:    viper.GetString("logger.log_level"),
+		},
+		Aws: &AwsConfig{
+			Sqs: &SqsConfig{
+				Region:   viper.GetString("aws.sqs.region"),
+				QueueURL: viper.GetString("aws.sqs.queue_url"),
+			},
+		},
+		Line: &LineConfig{
+			WebhookUrl: viper.GetString("line.webhook_url"),
+		},
 	}
 }

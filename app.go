@@ -26,7 +26,7 @@ func NewApp(arg *Arg) (*App, int) {
 	defer logger.logfile.Close()
 
 	// AWS接続のセッティング
-	sess, err := session.NewSession(&aws.Config{Region: aws.String(config.SqsRegion)})
+	sess, err := session.NewSession(&aws.Config{Region: aws.String(config.Aws.Sqs.Region)})
 	if err != nil {
 		logger.entry.Error("error: %#v", zap.Error(err))
 		return nil, ExitCodeAwsSettingError
@@ -36,7 +36,7 @@ func NewApp(arg *Arg) (*App, int) {
 	logger.entry.Info("AWS connect setting done")
 
 	// LINE接続のセッティング
-	lineCli, err := linebot.New(config.LineChannelSecret, config.LineAccessToken)
+	lineCli, err := linebot.New(config.Arg.lineChannelSecret, config.Arg.lineAccessToken)
 	if err != nil {
 		logger.entry.Error("error: %#v", zap.Error(err))
 		return nil, ExitCodeLineSettingError
@@ -66,7 +66,7 @@ func (a *App) Start() int {
 	handler := &webHandler{ctx: a.ctx}
 	e.POST("/srr/webhook", handler.HandlerFunc)
 
-	err := e.Start(a.ctx.config.ServerPort)
+	err := e.Start(a.ctx.config.Server.Port)
 	if err != nil {
 		a.ctx.logger.entry.Error("error: %#v", zap.Error(err))
 		return ExitCodeServerStartError
