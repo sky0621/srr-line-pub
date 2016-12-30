@@ -8,7 +8,6 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/line/line-bot-sdk-go/linebot"
-	"github.com/uber-go/zap"
 )
 
 func webSetup() *echo.Echo {
@@ -25,10 +24,10 @@ type webHandler struct {
 func (h *webHandler) HandlerFunc(c echo.Context) error {
 	events, err := h.ctx.lineCli.ParseRequest(c.Request())
 	if err != nil {
-		h.ctx.logger.entry.Error("error: %#v", zap.Error(err))
+		h.ctx.logger.entry.Error("error: %#v", err)
 		return err
 	}
-	h.ctx.logger.entry.Debug("LINE Messages will handle", zap.Int("eventLength", len(events)))
+	h.ctx.logger.entry.Debugf("LINE Messages will handle eventLength:%d", len(events))
 
 	for _, event := range events {
 		h.ctx.logger.entry.Debug(fmt.Sprintf("event: %#v", event))
@@ -49,7 +48,7 @@ func (h *webHandler) HandlerFunc(c echo.Context) error {
 				h.ctx.logger.entry.Debug(fmt.Sprintf("repMsg %#v", repMsg))
 
 				if _, err = h.ctx.lineCli.ReplyMessage(event.ReplyToken, newMsg).Do(); err != nil {
-					h.ctx.logger.entry.Error("ReplyMessage", zap.Error(err))
+					h.ctx.logger.entry.Error("ReplyMessage", err)
 					continue
 				}
 
@@ -60,7 +59,7 @@ func (h *webHandler) HandlerFunc(c echo.Context) error {
 				}
 				sqsRes, err := h.ctx.sqsCli.SendMessage(sqsParam)
 				if err != nil {
-					h.ctx.logger.entry.Error("sqsCli.SendMessage", zap.Error(err))
+					h.ctx.logger.entry.Error("sqsCli.SendMessage", err)
 					continue
 				}
 				h.ctx.logger.entry.Debug(fmt.Sprintf("sqsRes %#v", sqsRes))
@@ -77,7 +76,7 @@ func (h *webHandler) HandlerFunc(c echo.Context) error {
 				h.ctx.logger.entry.Debug(fmt.Sprintf("repMsg %#v", repMsg))
 
 				if _, err = h.ctx.lineCli.ReplyMessage(event.ReplyToken, newMsg).Do(); err != nil {
-					h.ctx.logger.entry.Error("ReplyMessage", zap.Error(err))
+					h.ctx.logger.entry.Error("ReplyMessage", err)
 					continue
 				}
 
@@ -88,7 +87,7 @@ func (h *webHandler) HandlerFunc(c echo.Context) error {
 				}
 				sqsRes, err := h.ctx.sqsCli.SendMessage(sqsParam)
 				if err != nil {
-					h.ctx.logger.entry.Error("sqsCli.SendMessage", zap.Error(err))
+					h.ctx.logger.entry.Error("sqsCli.SendMessage", err)
 					continue
 				}
 				h.ctx.logger.entry.Debug(fmt.Sprintf("sqsRes %#v", sqsRes))

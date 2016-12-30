@@ -1,5 +1,5 @@
-hash: 49fac131202df4b1f92a1be4e49e54aaa6ed257cbfe4b781f5ba3efa2ee1938b
-updated: 2016-12-31T04:49:05.8682328+09:00
+hash: cf99e0e63545de4c5744deffe99fbbd8b575aa1aa433c2a3e10ea838e96c998a
+updated: 2016-12-31T07:29:04.681902+09:00
 imports:
 - name: github.com/aws/aws-sdk-go
   version: 36670f6ab1769ad77fa5f7e2c194398733503635
@@ -73,6 +73,8 @@ imports:
   version: df1e16fde7fc330a0ca68167c23bf7ed6ac31d6d
 - name: github.com/pelletier/go-toml
   version: 017119f7a78a0b5fc0ea39ef6be09f03acf3345d
+- name: github.com/Sirupsen/logrus
+  version: d26492970760ca5d33129d2d799e34be5c4782eb
 - name: github.com/spf13/afero
   version: 2f30b2a92c0e5700bcfe4715891adb1f2a7a406d
   subpackages:
@@ -87,10 +89,6 @@ imports:
   version: 5ed0fc31f7f453625df314d8e66b9791e8d13003
 - name: github.com/tylerb/graceful
   version: 4df1190835320af7076dfcf27b3d071fd3612caf
-- name: github.com/uber-go/atomic
-  version: 3b8db5e93c4c02efbc313e17b2e796b0914a01fb
-- name: github.com/uber-go/zap
-  version: a5783ee4b216a927da8f839c45cfbf9d694e1467
 - name: github.com/valyala/fasttemplate
   version: 3b874956e03f1636d171bda64b130f9135f42cff
 - name: golang.org/x/crypto

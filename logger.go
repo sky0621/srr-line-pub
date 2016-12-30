@@ -2,14 +2,13 @@ package pub
 
 import (
 	"os"
-	"time"
 
-	"github.com/uber-go/zap"
+	"github.com/Sirupsen/logrus"
 )
 
 // AppLogger ...
 type AppLogger struct {
-	entry   zap.Logger
+	entry   *logrus.Entry
 	logfile *os.File
 }
 
@@ -26,24 +25,15 @@ func newAppLogger(c *Config) (*AppLogger, error) {
 		return nil, err
 	}
 
-	logger := zap.New(
-		zap.NewJSONEncoder(jstTimeFormatter("timestamp")),
-		zap.Output(logfile),
-	)
-	logger.With(
-		zap.String("Host", c.Server.Host),
-		zap.String("Port", c.Server.Port),
-		zap.String("System", c.AppName),
-	)
-	return &AppLogger{entry: logger, logfile: logfile}, nil
-}
-
-func jstTimeFormatter(key string) zap.TimeFormatter {
-	return zap.TimeFormatter(func(t time.Time) zap.Field {
-		const layout = "2006-01-02 15:04:05"
-		jst := time.FixedZone("Asia/Tokyo", 9*60*60)
-		return zap.String(key, t.In(jst).Format(layout))
+	logrusEntry := logrus.WithFields(logrus.Fields{
+		"host":   c.Server.Host,
+		"port":   c.Server.Port,
+		"system": c.AppName,
 	})
+	logrusEntry.Logger.Formatter = new(logrus.TextFormatter)
+	logrusEntry.Logger.Formatter = new(logrus.JSONFormatter) // default
+
+	return &AppLogger{entry: logrusEntry, logfile: logfile}, nil
 }
 
 // Close ...

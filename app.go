@@ -5,7 +5,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/line/line-bot-sdk-go/linebot"
-	"github.com/uber-go/zap"
 )
 
 // App ...
@@ -26,7 +25,7 @@ func NewApp(arg *Arg) (*App, int) {
 	// AWS接続のセッティング
 	sess, err := session.NewSession(&aws.Config{Region: aws.String(config.Aws.Sqs.Region)})
 	if err != nil {
-		logger.entry.Error("error: %#v", zap.Error(err))
+		logger.entry.Error("error: %#v", err)
 		return nil, ExitCodeAwsSettingError
 	}
 	sqsCli := sqs.New(sess)
@@ -36,7 +35,7 @@ func NewApp(arg *Arg) (*App, int) {
 	// LINE接続のセッティング
 	lineCli, err := linebot.New(config.Arg.lineChannelSecret, config.Arg.lineAccessToken)
 	if err != nil {
-		logger.entry.Error("error: %#v", zap.Error(err))
+		logger.entry.Error("error: %#v", err)
 		return nil, ExitCodeLineSettingError
 	}
 	logger.entry.Info("LINE connect setting done")
@@ -61,10 +60,10 @@ func (a *App) Start() int {
 	handler := &webHandler{ctx: a.ctx}
 	e.POST(a.ctx.config.Line.WebhookUrl, handler.HandlerFunc)
 
-	a.ctx.logger.entry.Info("Server will start", zap.String("port", a.ctx.config.Server.Port))
+	a.ctx.logger.entry.Infof("Server will start at Port[%s]", a.ctx.config.Server.Port)
 	err := e.Start(a.ctx.config.Server.Port)
 	if err != nil {
-		a.ctx.logger.entry.Error("error: %#v", zap.Error(err))
+		a.ctx.logger.entry.Error("error: %#v", err)
 		return ExitCodeServerStartError
 	}
 
