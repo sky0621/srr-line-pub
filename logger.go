@@ -33,6 +33,14 @@ func newAppLogger(c *Config) (*AppLogger, error) {
 	logrusEntry.Logger.Formatter = new(logrus.TextFormatter)
 	logrusEntry.Logger.Formatter = new(logrus.JSONFormatter) // default
 
+	logrusEntry.Logger.Out = logfile
+
+	level, err := logrus.ParseLevel(c.Logger.Level)
+	if err != nil {
+		return nil, err
+	}
+	logrusEntry.Logger.Level = level
+
 	return &AppLogger{entry: logrusEntry, logfile: logfile}, nil
 }
 
