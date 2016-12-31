@@ -8,13 +8,30 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/labstack/gommon/log"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
-func webSetup() *echo.Echo {
+func webSetup(cfg *Config) *echo.Echo {
 	e := echo.New()
+	e.Debug = true
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	switch cfg.Logger.Level {
+	case "debug":
+		e.Logger.SetLevel(log.DEBUG)
+	case "info":
+		e.Logger.SetLevel(log.INFO)
+	case "warn":
+		e.Logger.SetLevel(log.WARN)
+	case "error":
+		e.Logger.SetLevel(log.ERROR)
+	}
+	logfile, err := logfile(cfg.Logger.Filepath)
+	if err != nil {
+		return nil
+	}
+	e.Logger.SetOutput(logfile)
 	return e
 }
 
@@ -27,16 +44,19 @@ func (h *webHandler) log() *logrus.Entry {
 }
 
 func (h *webHandler) HandlerFunc(c echo.Context) error {
-	h.log().Debug("echo HandleFunc will start")
+	h.log().Debug("HandleFunc will start")
+	c.Logger().Debug("[echo]HandleFunc will start")
 	events, err := h.ctx.lineCli.ParseRequest(c.Request())
 	if err != nil {
 		h.log().Errorf("error: %#v", err)
 		return err
 	}
 	h.log().Debugf("LINE Messages will handle eventLength:%d", len(events))
+	c.Logger().Debugf("[echo]LINE Messages will handle eventLength:%d", len(events))
 
 	for _, event := range events {
 		h.log().Debug(fmt.Sprintf("event: %#v", event))
+		c.Logger().Debug(fmt.Sprintf("[echo]event: %#v", event))
 
 		if event.Type == linebot.EventTypeMessage {
 			switch message := event.Message.(type) {

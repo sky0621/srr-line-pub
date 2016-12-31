@@ -56,11 +56,12 @@ func NewApp(arg *Arg) (*App, int) {
 func (a *App) Start() int {
 	a.ctx.logger.entry.Info("App will start")
 
-	e := webSetup()
+	e := webSetup(a.ctx.config)
 	handler := &webHandler{ctx: a.ctx}
 	e.POST(a.ctx.config.Line.WebhookUrl, handler.HandlerFunc)
 
 	a.ctx.logger.entry.Infof("Server will start at Port[%s]", a.ctx.config.Server.Port)
+	e.Logger.Debugf("Echo Server will start at Port[%s]", a.ctx.config.Server.Port)
 	err := e.Start(a.ctx.config.Server.Port)
 	if err != nil {
 		a.ctx.logger.entry.Error("error: %#v", err)
