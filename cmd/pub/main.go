@@ -32,7 +32,7 @@ func wrappedMain() int {
 	if exitCode > pub.ExitCodeOK {
 		return exitCode
 	}
-	defer app.logger.Close()
+	defer app.Close()
 
 	return app.Start()
 }
