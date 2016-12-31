@@ -44,7 +44,7 @@ type webHandler struct {
 
 func (h *webHandler) HandlerFunc(c echo.Context) error {
 	// h.log().Debug("HandleFunc will start")
-	c.Logger().Debug("[echo]HandleFunc will start")
+	c.Logger().Info("[echo]HandleFunc will start")
 	events, err := h.ctx.lineCli.ParseRequest(c.Request())
 	if err != nil {
 		// h.log().Errorf("error: %#v", err)
@@ -52,17 +52,17 @@ func (h *webHandler) HandlerFunc(c echo.Context) error {
 		return err
 	}
 	// h.log().Debugf("LINE Messages will handle eventLength:%d", len(events))
-	c.Logger().Debugf("[echo]LINE Messages will handle eventLength:%d", len(events))
+	c.Logger().Infof("[echo]LINE Messages will handle eventLength:%d", len(events))
 
 	for _, event := range events {
 		// h.log().Debug(fmt.Sprintf("event: %#v", event))
-		c.Logger().Debug(fmt.Sprintf("[echo]event: %#v", event))
+		c.Logger().Info(fmt.Sprintf("[echo]event: %#v", event))
 
 		if event.Type == linebot.EventTypeMessage {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
 				// h.log().Debug(fmt.Sprintf("TextMessage: %#v", message))
-				c.Logger().Debug(fmt.Sprintf("TextMessage: %#v", message))
+				c.Logger().Info(fmt.Sprintf("TextMessage: %#v", message))
 				var newMsg *linebot.TextMessage
 				if "あぶない" == message.Text {
 					newMsg = linebot.NewTextMessage("ばしょをちずでおしえて！")
@@ -70,11 +70,11 @@ func (h *webHandler) HandlerFunc(c echo.Context) error {
 					newMsg = linebot.NewTextMessage(message.Text + "!?")
 				}
 				// h.log().Debug(fmt.Sprintf("newMsg %#v", newMsg))
-				c.Logger().Debug(fmt.Sprintf("newMsg %#v", newMsg))
+				c.Logger().Info(fmt.Sprintf("newMsg %#v", newMsg))
 
 				repMsg := h.ctx.lineCli.ReplyMessage(event.ReplyToken, newMsg)
 				// h.log().Debug(fmt.Sprintf("repMsg %#v", repMsg))
-				c.Logger().Debug(fmt.Sprintf("repMsg %#v", repMsg))
+				c.Logger().Info(fmt.Sprintf("repMsg %#v", repMsg))
 
 				if _, err = h.ctx.lineCli.ReplyMessage(event.ReplyToken, newMsg).Do(); err != nil {
 					// h.log().Error("ReplyMessage", err)
@@ -83,7 +83,7 @@ func (h *webHandler) HandlerFunc(c echo.Context) error {
 				}
 
 				// h.log().Debug("SQS will insert")
-				c.Logger().Debug("SQS will insert")
+				c.Logger().Info("SQS will insert")
 				sqsParam := &sqs.SendMessageInput{
 					QueueUrl:    aws.String(h.ctx.config.Aws.Sqs.QueueURL),
 					MessageBody: aws.String(message.Text),
@@ -95,21 +95,21 @@ func (h *webHandler) HandlerFunc(c echo.Context) error {
 					continue
 				}
 				// h.log().Debug(fmt.Sprintf("sqsRes %#v", sqsRes))
-				c.Logger().Debug(fmt.Sprintf("sqsRes %#v", sqsRes))
+				c.Logger().Info(fmt.Sprintf("sqsRes %#v", sqsRes))
 
 			case *linebot.LocationMessage:
 				// h.log().Debug(fmt.Sprintf("LocationMessage %#v", message))
-				c.Logger().Debug(fmt.Sprintf("LocationMessage %#v", message))
+				c.Logger().Info(fmt.Sprintf("LocationMessage %#v", message))
 				lat := message.Latitude
 				lon := message.Longitude
 				addr := message.Address
 				retMsg := fmt.Sprintf("じゅうしょは、%s \n緯度：%f\n経度：%f\nだね。ありがとう。みんなにもおしえてあげるね。", addr, lat, lon)
 				// h.log().Debug(fmt.Sprintf("retMsg %#v", retMsg))
-				c.Logger().Debug(fmt.Sprintf("retMsg %#v", retMsg))
+				c.Logger().Info(fmt.Sprintf("retMsg %#v", retMsg))
 				newMsg := linebot.NewTextMessage(retMsg)
 				repMsg := h.ctx.lineCli.ReplyMessage(event.ReplyToken, newMsg)
 				// h.log().Debug(fmt.Sprintf("repMsg %#v", repMsg))
-				c.Logger().Debug(fmt.Sprintf("repMsg %#v", repMsg))
+				c.Logger().Info(fmt.Sprintf("repMsg %#v", repMsg))
 
 				if _, err = h.ctx.lineCli.ReplyMessage(event.ReplyToken, newMsg).Do(); err != nil {
 					// h.log().Error("ReplyMessage", err)
@@ -118,7 +118,7 @@ func (h *webHandler) HandlerFunc(c echo.Context) error {
 				}
 
 				// h.log().Debug("SQS will insert")
-				c.Logger().Debug("SQS will insert")
+				c.Logger().Info("SQS will insert")
 				sqsParam := &sqs.SendMessageInput{
 					QueueUrl:    aws.String(h.ctx.config.Aws.Sqs.QueueURL),
 					MessageBody: aws.String(fmt.Sprintf("lat:%v, lon:%v, addr:%v", lat, lon, addr)),
@@ -130,11 +130,11 @@ func (h *webHandler) HandlerFunc(c echo.Context) error {
 					continue
 				}
 				// h.log().Debug(fmt.Sprintf("sqsRes %#v", sqsRes))
-				c.Logger().Debug(fmt.Sprintf("sqsRes %#v", sqsRes))
+				c.Logger().Info(fmt.Sprintf("sqsRes %#v", sqsRes))
 
 			default:
 				// h.log().Debug(fmt.Sprintf("Other Message %#v", message))
-				c.Logger().Debug(fmt.Sprintf("Other Message %#v", message))
+				c.Logger().Info(fmt.Sprintf("Other Message %#v", message))
 			}
 
 		}
