@@ -32,6 +32,8 @@ func wrappedMain() int {
 	if exitCode > pub.ExitCodeOK {
 		return exitCode
 	}
+	defer app.logger.Close()
+
 	return app.Start()
 }
 

@@ -37,8 +37,8 @@ func newAppLogger(c *Config) (*AppLogger, error) {
 }
 
 // Close ...
-func (l *AppLogger) Close() {
-	l.logfile.Close()
+func (l *AppLogger) Close() error {
+	return l.logfile.Close()
 }
 
 func logfile(filepath string) (*os.File, error) {

@@ -20,7 +20,6 @@ func NewApp(arg *Arg) (*App, int) {
 	if err != nil {
 		return nil, ExitCodeLogSetupError
 	}
-	defer logger.Close()
 
 	// AWS接続のセッティング
 	sess, err := session.NewSession(&aws.Config{Region: aws.String(config.Aws.Sqs.Region)})
@@ -69,4 +68,9 @@ func (a *App) Start() int {
 	}
 
 	return ExitCodeOK
+}
+
+// Close ...
+func (a *App) Close() error {
+	return a.ctx.logger.Close()
 }
