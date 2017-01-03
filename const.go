@@ -11,3 +11,7 @@ const (
 	ExitCodeError
 	ExitCodePanic
 )
+
+const (
+	constEnvLocal = "local"
+)

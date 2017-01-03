@@ -6,38 +6,36 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-// AppLogger ...
-type AppLogger struct {
+type appLogger struct {
 	entry   *logrus.Entry
 	logfile *os.File
 }
 
-// newAppLogger ...
-func newAppLogger(c *Config) (*AppLogger, error) {
+func newAppLogger(c *loggerConfig) (*appLogger, error) {
 	logrusEntry := logrus.WithFields(logrus.Fields{
-		"host":   c.Server.Host,
-		"port":   c.Server.Port,
-		"system": c.AppName,
+		"host":   c.server.host,
+		"port":   c.server.port,
+		"system": c.appName,
 	})
 	logrusEntry.Logger.Formatter = new(logrus.JSONFormatter)
 
-	logfile, err := logfile(c.Logger.Filepath)
+	logfile, err := logfile(c.filepath)
 	if err != nil {
 		return nil, err
 	}
 	logrusEntry.Logger.Out = logfile
 
-	level, err := logrus.ParseLevel(c.Logger.Level)
+	level, err := logrus.ParseLevel(c.level)
 	if err != nil {
 		return nil, err
 	}
 	logrusEntry.Logger.Level = level
 
-	return &AppLogger{entry: logrusEntry, logfile: logfile}, nil
+	return &appLogger{entry: logrusEntry, logfile: logfile}, nil
 }
 
 // Close ...
-func (l *AppLogger) Close() error {
+func (l *appLogger) Close() error {
 	return l.logfile.Close()
 }
 

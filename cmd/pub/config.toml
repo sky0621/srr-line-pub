@@ -1,3 +1,4 @@
+environment = "local"
 app_name = "srr-line-pub"
 
 [server]
@@ -5,13 +6,13 @@ host = "localhost"  # your server
 port = ":8080"  # your server port
 
 [logger]
-filepath = "srr-line-pub.log" # log file fullpath
+filepath = "./srr-line-pub.log" # log file fullpath
 log_level = "debug" # debug, info, warning, error, fatal
 
 [aws]
   [aws.sqs]
   region = "ap-northeast-1" # アジアパシフィック (東京)
-  queue_url = "【SQSのURL】"
+  queue_url = "localhost" # SQSのURL
 
 [line]
-webhook_url = "【LINEのWebhook URL】"
+webhook_url = "localhost" # LINEのWebhook URL

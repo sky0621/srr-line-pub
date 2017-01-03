@@ -1,69 +1,66 @@
 package pub
 
-import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/line/line-bot-sdk-go/linebot"
-)
-
 // App ...
 type App struct {
-	ctx *ctx
+	logger      *appLogger
+	config      *config
+	awsHandler  awsHandlerIF
+	lineHandler lineHandlerIF
 }
 
 // NewApp ...
 func NewApp(arg *Arg) (*App, int) {
-	config := newConfig(arg)
+	err := readConfig(arg.configFilePath)
+	if err != nil {
+		panic(err)
+	}
 
-	logger, err := newAppLogger(config)
+	logger, err := newAppLogger(newLoggerConfig())
 	if err != nil {
 		return nil, ExitCodeLogSetupError
 	}
 
-	// AWS接続のセッティング
-	sess, err := session.NewSession(&aws.Config{Region: aws.String(config.Aws.Sqs.Region)})
+	awsHandler, err := newAwsHandler(newAwsConfig())
 	if err != nil {
-		logger.entry.Error("error: %#v", err)
+		logger.entry.Errorf("AWS setting error %#v", err)
 		return nil, ExitCodeAwsSettingError
 	}
-	sqsCli := sqs.New(sess)
-
 	logger.entry.Info("AWS connect setting done")
 
-	// LINE接続のセッティング
-	lineCli, err := linebot.New(config.Arg.lineChannelSecret, config.Arg.lineAccessToken)
+	lineHandler, err := newLineHandler(newLineConfig(), arg)
 	if err != nil {
-		logger.entry.Error("error: %#v", err)
+		logger.entry.Error("LINE setting error: %#v", err)
 		return nil, ExitCodeLineSettingError
 	}
 	logger.entry.Info("LINE connect setting done")
 
 	app := &App{
-		ctx: &ctx{
-			logger:     logger,
-			config:     config,
-			awsSession: sess,
-			sqsCli:     sqsCli,
-			lineCli:    lineCli,
-		},
+		logger:      logger,
+		config:      newConfig(),
+		awsHandler:  awsHandler,
+		lineHandler: lineHandler,
 	}
 	return app, ExitCodeOK
 }
 
 // Start ...
 func (a *App) Start() int {
-	a.ctx.logger.entry.Info("App will start")
+	a.logger.entry.Info("App will start")
 
-	e := webSetup(a.ctx.config)
-	handler := &webHandler{ctx: a.ctx}
-	e.POST(a.ctx.config.Line.WebhookUrl, handler.HandlerFunc)
+	e := webSetup(a.config.logger)
+	handler := &webHandler{
+		logger:      a.logger,
+		config:      a.config,
+		awsHandler:  a.awsHandler,
+		lineHandler: a.lineHandler,
+	}
+	e.POST(a.config.line.webhookURL, handler.HandlerFunc)
 
-	a.ctx.logger.entry.Infof("Server will start at Port[%s]", a.ctx.config.Server.Port)
-	e.Logger.Infof("Echo Server will start at Port[%s]", a.ctx.config.Server.Port)
-	err := e.Start(a.ctx.config.Server.Port)
+	a.logger.entry.Infof("Server will start at Port[%s]", a.config.server.port)
+	e.Logger.Infof("Echo Server will start at Port[%s]", a.config.server.port)
+	err := e.Start(a.config.server.port)
 	if err != nil {
-		a.ctx.logger.entry.Error("error: %#v", err)
+		a.logger.entry.Error("error: %#v", err)
 		return ExitCodeServerStartError
 	}
 
@@ -72,5 +69,5 @@ func (a *App) Start() int {
 
 // Close ...
 func (a *App) Close() error {
-	return a.ctx.logger.Close()
+	return a.logger.Close()
 }
