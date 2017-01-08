@@ -12,12 +12,12 @@ type awsHandler struct {
 	logger     *appLogger
 }
 
-func newAwsHandler(cfg *awsConfig, logger *appLogger) (awsHandlerIF, error) {
+func newAwsHandler(cfg *awsConfig, arg *Arg, logger *appLogger) (awsHandlerIF, error) {
 	if cfg.environment == constEnvLocal {
 		return &awsHandlerMock{}, nil
 	}
 
-	sqsHandler, err := newSqsHandler(cfg.sqs, logger)
+	sqsHandler, err := newSqsHandler(cfg.sqs, arg, logger)
 	if err != nil {
 		return nil, err
 	}

@@ -27,7 +27,7 @@ func NewApp(arg *Arg) (*App, int) {
 		return nil, ExitCodeLogSetupError
 	}
 
-	awsHandler, err := newAwsHandler(newAwsConfig(), logger)
+	awsHandler, err := newAwsHandler(newAwsConfig(), arg, logger)
 	if err != nil {
 		logger.entry.Errorf("AWS setting error %#v", err)
 		return nil, ExitCodeAwsSettingError

@@ -17,17 +17,17 @@ type sqsHandler struct {
 	logger *appLogger
 }
 
-func newSqsHandler(cfg *sqsConfig, logger *appLogger) (sqsHandlerIF, error) {
+func newSqsHandler(cfg *sqsConfig, arg *Arg, logger *appLogger) (sqsHandlerIF, error) {
 	if cfg.environment == constEnvLocal {
 		return &sqsHandlerMock{}, nil
 	}
 
 	// Credentialは環境変数セット済の前提
 	awsCfg := &aws.Config{
-		Region:   aws.String(cfg.region),
-		Endpoint: aws.String(cfg.endpoint),
+		Credentials: credentials.NewStaticCredentials(arg.awsAccessKeyID, arg.awsSecretAccessKey, ""),
+		Region:      aws.String(cfg.region),
+		Endpoint:    aws.String(cfg.endpoint),
 	}
-	awsCfg.Credentials = credentials.NewEnvCredentials()
 
 	sess, err := session.NewSession(awsCfg)
 	if err != nil {
