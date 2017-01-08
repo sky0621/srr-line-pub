@@ -12,10 +12,16 @@ import (
 )
 
 func webSetup(cfg *loggerConfig) *echo.Echo {
+	logfile, err := logfile(cfg.filepath)
+	if err != nil {
+		return nil
+	}
+
 	e := echo.New()
 	e.Debug = true
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Output: logfile,
+	}))
 	switch cfg.level {
 	case "debug":
 		e.Logger.SetLevel(log.DEBUG)
@@ -26,11 +32,8 @@ func webSetup(cfg *loggerConfig) *echo.Echo {
 	case "error":
 		e.Logger.SetLevel(log.ERROR)
 	}
-	logfile, err := logfile(cfg.filepath)
-	if err != nil {
-		return nil
-	}
-	e.Logger.SetOutput(logfile)
+	e.Use(middleware.Recover())
+	// e.Logger.SetOutput(logfile)
 	return e
 }
 
