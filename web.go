@@ -1,7 +1,9 @@
 package pub
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/Sirupsen/logrus"
@@ -52,7 +54,7 @@ func (h *webHandler) log() *logrus.Entry {
 
 func (h *webHandler) HandlerFunc(w http.ResponseWriter, r *http.Request) {
 	h.log().Debug("HandleFunc will start")
-	events, err := h.lineHandler.getClient().ParseRequest(r)
+	events, err := ParseRequest(r)
 	if err != nil {
 		h.log().Errorf("error: %#v", err)
 		return
@@ -129,6 +131,26 @@ func (h *webHandler) HandlerFunc(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+}
+
+// ParseRequest method
+func ParseRequest(r *http.Request) ([]linebot.Event, error) {
+	defer r.Body.Close()
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, err
+	}
+	// if !client.validateSignature(r.Header.Get("X-LINE-Signature"), body) {
+	// 	return nil, ErrInvalidSignature
+	// }
+
+	request := &struct {
+		Events []linebot.Event `json:"events"`
+	}{}
+	if err = json.Unmarshal(body, request); err != nil {
+		return nil, err
+	}
+	return request.Events, nil
 }
 
 func (h *webHandler) HandlerFunc2(c echo.Context) error {
