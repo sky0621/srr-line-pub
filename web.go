@@ -1,45 +1,12 @@
 package pub
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
-	"github.com/labstack/gommon/log"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
-
-func webSetup(cfg *loggerConfig) *echo.Echo {
-	logfile, err := logfile(cfg.filepath)
-	if err != nil {
-		return nil
-	}
-
-	e := echo.New()
-	e.Debug = true
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Output: logfile,
-	}))
-	switch cfg.level {
-	case "debug":
-		e.Logger.SetLevel(log.DEBUG)
-	case "info":
-		e.Logger.SetLevel(log.INFO)
-	case "warn":
-		e.Logger.SetLevel(log.WARN)
-	case "error":
-		e.Logger.SetLevel(log.ERROR)
-	}
-	e.Use(middleware.Recover())
-	// e.Logger.SetOutput(logfile)
-	return e
-}
 
 type webHandler struct {
 	logger      *appLogger
@@ -54,7 +21,7 @@ func (h *webHandler) log() *logrus.Entry {
 
 func (h *webHandler) HandlerFunc(w http.ResponseWriter, r *http.Request) {
 	h.log().Debug("HandleFunc will start")
-	events, err := ParseRequest(r)
+	events, err := h.lineHandler.parseRequest(r)
 	if err != nil {
 		h.log().Errorf("error: %#v", err)
 		return
@@ -85,11 +52,7 @@ func (h *webHandler) HandlerFunc(w http.ResponseWriter, r *http.Request) {
 				}
 
 				h.log().Debug("SQS will insert")
-				sqsParam := &sqs.SendMessageInput{
-					QueueUrl:    aws.String(h.config.aws.sqs.queueURL),
-					MessageBody: aws.String(message.Text),
-				}
-				sqsRes, err := h.awsHandler.getSqsClient().SendMessage(sqsParam)
+				sqsRes, err := h.awsHandler.getSqsHandler().sendMessage(message.Text)
 				if err != nil {
 					h.log().Error("sqsCli.SendMessage", err)
 					continue
@@ -113,11 +76,7 @@ func (h *webHandler) HandlerFunc(w http.ResponseWriter, r *http.Request) {
 				}
 
 				h.log().Debug("SQS will insert")
-				sqsParam := &sqs.SendMessageInput{
-					QueueUrl:    aws.String(h.config.aws.sqs.queueURL),
-					MessageBody: aws.String(fmt.Sprintf("lat:%v, lon:%v, addr:%v", lat, lon, addr)),
-				}
-				sqsRes, err := h.awsHandler.getSqsClient().SendMessage(sqsParam)
+				sqsRes, err := h.awsHandler.getSqsHandler().sendMessage(fmt.Sprintf("lat:%v, lon:%v, addr:%v", lat, lon, addr))
 				if err != nil {
 					h.log().Error("sqsCli.SendMessage", err)
 					continue
@@ -131,126 +90,4 @@ func (h *webHandler) HandlerFunc(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-}
-
-// ParseRequest method
-func ParseRequest(r *http.Request) ([]linebot.Event, error) {
-	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return nil, err
-	}
-	// if !client.validateSignature(r.Header.Get("X-LINE-Signature"), body) {
-	// 	return nil, ErrInvalidSignature
-	// }
-
-	request := &struct {
-		Events []linebot.Event `json:"events"`
-	}{}
-	if err = json.Unmarshal(body, request); err != nil {
-		return nil, err
-	}
-	return request.Events, nil
-}
-
-func (h *webHandler) HandlerFunc2(c echo.Context) error {
-	// h.log().Debug("HandleFunc will start")
-	c.Logger().Info("[echo]HandleFunc will start")
-	events, err := h.lineHandler.getClient().ParseRequest(c.Request())
-	if err != nil {
-		// h.log().Errorf("error: %#v", err)
-		c.Logger().Errorf("error: %#v", err)
-		return err
-	}
-	// h.log().Debugf("LINE Messages will handle eventLength:%d", len(events))
-	c.Logger().Infof("[echo]LINE Messages will handle eventLength:%d", len(events))
-
-	for _, event := range events {
-		// h.log().Debug(fmt.Sprintf("event: %#v", event))
-		c.Logger().Info(fmt.Sprintf("[echo]event: %#v", event))
-
-		if event.Type == linebot.EventTypeMessage {
-			switch message := event.Message.(type) {
-			case *linebot.TextMessage:
-				// h.log().Debug(fmt.Sprintf("TextMessage: %#v", message))
-				c.Logger().Info(fmt.Sprintf("TextMessage: %#v", message))
-				var newMsg *linebot.TextMessage
-				if "あぶない" == message.Text {
-					newMsg = linebot.NewTextMessage("ばしょをちずでおしえて！")
-				} else {
-					newMsg = linebot.NewTextMessage(message.Text + "!?")
-				}
-				// h.log().Debug(fmt.Sprintf("newMsg %#v", newMsg))
-				c.Logger().Info(fmt.Sprintf("newMsg %#v", newMsg))
-
-				repMsg := h.lineHandler.getClient().ReplyMessage(event.ReplyToken, newMsg)
-				// h.log().Debug(fmt.Sprintf("repMsg %#v", repMsg))
-				c.Logger().Info(fmt.Sprintf("repMsg %#v", repMsg))
-
-				if _, err = h.lineHandler.getClient().ReplyMessage(event.ReplyToken, newMsg).Do(); err != nil {
-					// h.log().Error("ReplyMessage", err)
-					c.Logger().Error("ReplyMessage", err)
-					continue
-				}
-
-				// h.log().Debug("SQS will insert")
-				c.Logger().Info("SQS will insert")
-				sqsParam := &sqs.SendMessageInput{
-					QueueUrl:    aws.String(h.config.aws.sqs.queueURL),
-					MessageBody: aws.String(message.Text),
-				}
-				sqsRes, err := h.awsHandler.getSqsClient().SendMessage(sqsParam)
-				if err != nil {
-					// h.log().Error("sqsCli.SendMessage", err)
-					c.Logger().Error("sqsCli.SendMessage", err)
-					continue
-				}
-				// h.log().Debug(fmt.Sprintf("sqsRes %#v", sqsRes))
-				c.Logger().Info(fmt.Sprintf("sqsRes %#v", sqsRes))
-
-			case *linebot.LocationMessage:
-				// h.log().Debug(fmt.Sprintf("LocationMessage %#v", message))
-				c.Logger().Info(fmt.Sprintf("LocationMessage %#v", message))
-				lat := message.Latitude
-				lon := message.Longitude
-				addr := message.Address
-				retMsg := fmt.Sprintf("じゅうしょは、%s \n緯度：%f\n経度：%f\nだね。ありがとう。みんなにもおしえてあげるね。", addr, lat, lon)
-				// h.log().Debug(fmt.Sprintf("retMsg %#v", retMsg))
-				c.Logger().Info(fmt.Sprintf("retMsg %#v", retMsg))
-				newMsg := linebot.NewTextMessage(retMsg)
-				repMsg := h.lineHandler.getClient().ReplyMessage(event.ReplyToken, newMsg)
-				// h.log().Debug(fmt.Sprintf("repMsg %#v", repMsg))
-				c.Logger().Info(fmt.Sprintf("repMsg %#v", repMsg))
-
-				if _, err = h.lineHandler.getClient().ReplyMessage(event.ReplyToken, newMsg).Do(); err != nil {
-					// h.log().Error("ReplyMessage", err)
-					c.Logger().Error("ReplyMessage", err)
-					continue
-				}
-
-				// h.log().Debug("SQS will insert")
-				c.Logger().Info("SQS will insert")
-				sqsParam := &sqs.SendMessageInput{
-					QueueUrl:    aws.String(h.config.aws.sqs.queueURL),
-					MessageBody: aws.String(fmt.Sprintf("lat:%v, lon:%v, addr:%v", lat, lon, addr)),
-				}
-				sqsRes, err := h.awsHandler.getSqsClient().SendMessage(sqsParam)
-				if err != nil {
-					// h.log().Error("sqsCli.SendMessage", err)
-					c.Logger().Error("sqsCli.SendMessage", err)
-					continue
-				}
-				// h.log().Debug(fmt.Sprintf("sqsRes %#v", sqsRes))
-				c.Logger().Info(fmt.Sprintf("sqsRes %#v", sqsRes))
-
-			default:
-				// h.log().Debug(fmt.Sprintf("Other Message %#v", message))
-				c.Logger().Info(fmt.Sprintf("Other Message %#v", message))
-			}
-
-		}
-
-	}
-
-	return nil
 }

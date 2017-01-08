@@ -1,36 +1,33 @@
 package pub
 
-import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sqs"
-)
+import "github.com/aws/aws-sdk-go/aws/session"
 
 type awsHandlerIF interface {
-	getSqsClient() *sqs.SQS
+	getSqsHandler() sqsHandlerIF
 }
 
 type awsHandler struct {
-	session   *session.Session
-	sqsClient *sqs.SQS
+	session    *session.Session
+	sqsHandler sqsHandlerIF
+	logger     *appLogger
 }
 
-func newAwsHandler(cfg *awsConfig) (awsHandlerIF, error) {
+func newAwsHandler(cfg *awsConfig, logger *appLogger) (awsHandlerIF, error) {
 	if cfg.environment == constEnvLocal {
 		return &awsHandlerMock{}, nil
 	}
-	sess, err := session.NewSession(&aws.Config{Region: aws.String(cfg.sqs.region)})
+
+	sqsHandler, err := newSqsHandler(cfg.sqs, logger)
 	if err != nil {
 		return nil, err
 	}
-	cli := sqs.New(sess)
 
 	return &awsHandler{
-		session:   sess,
-		sqsClient: cli,
+		sqsHandler: sqsHandler,
+		logger:     logger,
 	}, nil
 }
 
-func (h *awsHandler) getSqsClient() *sqs.SQS {
-	return h.sqsClient
+func (h *awsHandler) getSqsHandler() sqsHandlerIF {
+	return h.sqsHandler
 }

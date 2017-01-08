@@ -12,7 +12,8 @@ log_level = "debug" # debug, info, warning, error, fatal
 [aws]
   [aws.sqs]
   region = "ap-northeast-1" # アジアパシフィック (東京)
-  queue_url = "localhost" # SQSのURL
+  endpoint = "localhost" # SQSのエンドポイントURL
+  name = "queuename" # SQSのキューの名前
 
 [line]
-webhook_url = "/lcl/path" # LINEのWebhook URL
+webhook_url = "/local/path" # LINEのWebhook URL

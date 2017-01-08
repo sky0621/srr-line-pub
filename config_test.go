@@ -1,9 +1,6 @@
 package pub
 
-import (
-	"reflect"
-	"testing"
-)
+import "testing"
 
 var expected = &config{
 	environment: "local",
@@ -25,20 +22,22 @@ var expected = &config{
 	aws: &awsConfig{
 		environment: "local",
 		sqs: &sqsConfig{
-			region:   "ap-northeast-1",
-			queueURL: "localhost",
+			environment: "local",
+			region:      "ap-northeast-1",
+			endpoint:    "localhost",
+			name:        "queuename",
 		},
 	},
 	line: &lineConfig{
 		environment: "local",
-		webhookURL:  "localhost",
+		webhookURL:  "/local/path",
 	},
 }
 
 func TestNewConfig(t *testing.T) {
 	readConfig("./cmd/pub/config.toml")
 	actual := newConfig()
-	if !reflect.DeepEqual(expected, actual) {
-		t.Errorf("\nExpect is %#v\nActual is %#v", expected, actual)
+	if expected.String() != actual.String() {
+		t.Errorf("\nExpect is %#v\nActual is %#v", expected.String(), actual.String())
 	}
 }

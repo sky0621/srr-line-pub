@@ -27,14 +27,14 @@ func NewApp(arg *Arg) (*App, int) {
 		return nil, ExitCodeLogSetupError
 	}
 
-	awsHandler, err := newAwsHandler(newAwsConfig())
+	awsHandler, err := newAwsHandler(newAwsConfig(), logger)
 	if err != nil {
 		logger.entry.Errorf("AWS setting error %#v", err)
 		return nil, ExitCodeAwsSettingError
 	}
 	logger.entry.Info("AWS connect setting done")
 
-	lineHandler, err := newLineHandler(newLineConfig(), arg)
+	lineHandler, err := newLineHandler(newLineConfig(), arg, logger)
 	if err != nil {
 		logger.entry.Error("LINE setting error: %#v", err)
 		return nil, ExitCodeLineSettingError
@@ -54,7 +54,6 @@ func NewApp(arg *Arg) (*App, int) {
 func (a *App) Start() int {
 	a.logger.entry.Info("App will start")
 
-	// e := webSetup(a.config.logger)
 	mux := http.NewServeMux()
 
 	handler := &webHandler{
@@ -64,17 +63,11 @@ func (a *App) Start() int {
 		lineHandler: a.lineHandler,
 	}
 
-	// e.POST(a.config.line.webhookURL, handler.HandlerFunc)
 	mux.HandleFunc(a.config.line.webhookURL, handler.HandlerFunc)
 
 	a.logger.entry.Infof("Server will start at Port[%s]", a.config.server.port)
-	// e.Logger.Infof("Echo Server will start at Port[%s]", a.config.server.port)
-	// err := e.Start(a.config.server.port)
 	graceful.Run(a.config.server.port, 1*time.Second, mux)
-	// if err != nil {
-	// 	a.logger.entry.Error("error: %#v", err)
-	// 	return ExitCodeServerStartError
-	// }
+	a.logger.entry.Infof("Server stop at Port[%s]", a.config.server.port)
 
 	return ExitCodeOK
 }

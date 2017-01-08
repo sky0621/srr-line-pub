@@ -39,13 +39,10 @@ func wrappedMain() int {
 
 func parseFlag() *pub.Arg {
 	f := flag.String("f", "./config.toml", "Config File Fullpath")
-	// AWS
-	ak := flag.String("ak", "accessKeyId", "AWS AdcessKeyId")
-	as := flag.String("as", "secretAccessKey", "AWS SecretAccessKey")
 	// LINE-API
 	ls := flag.String("ls", "channelSecret", "LINE ChannelSecret")
 	lt := flag.String("lt", "accessToken", "LINE AccessToken")
 	flag.Parse()
-	arg := pub.NewArg(*f, *ak, *as, *ls, *lt)
+	arg := pub.NewArg(*f, *ls, *lt)
 	return arg
 }

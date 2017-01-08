@@ -1,6 +1,10 @@
 package pub
 
-import "github.com/spf13/viper"
+import (
+	"fmt"
+
+	"github.com/spf13/viper"
+)
 
 type config struct {
 	environment string
@@ -22,6 +26,10 @@ func newConfig() *config {
 	}
 }
 
+func (c *config) String() string {
+	return fmt.Sprintf("environment: %s, appName: %s, server: %s, logger: %s, aws: %s, line: %s", c.environment, c.appName, c.server.String(), c.logger.String(), c.aws.String(), c.line.String())
+}
+
 type serverConfig struct {
 	host string
 	port string
@@ -32,6 +40,10 @@ func newServerConfig() *serverConfig {
 		host: viper.GetString("server.host"),
 		port: viper.GetString("server.port"),
 	}
+}
+
+func (c *serverConfig) String() string {
+	return fmt.Sprintf("host: %s, port: %s", c.host, c.port)
 }
 
 type loggerConfig struct {
@@ -52,6 +64,10 @@ func newLoggerConfig() *loggerConfig {
 	}
 }
 
+func (c *loggerConfig) String() string {
+	return fmt.Sprintf("environment: %s, appName: %s, filepath: %s, level: %s, server: %s", c.environment, c.appName, c.filepath, c.level, c.server.String())
+}
+
 type awsConfig struct {
 	environment string
 	sqs         *sqsConfig
@@ -64,16 +80,28 @@ func newAwsConfig() *awsConfig {
 	}
 }
 
+func (c *awsConfig) String() string {
+	return fmt.Sprintf("environment: %s, sqs: %s", c.environment, c.sqs.String())
+}
+
 type sqsConfig struct {
-	region   string `toml:"aws.sqs.region"`
-	queueURL string `toml:"aws.sqs.queue_url"`
+	environment string
+	region      string
+	endpoint    string
+	name        string
 }
 
 func newSqsConfig() *sqsConfig {
 	return &sqsConfig{
-		region:   viper.GetString("aws.sqs.region"),
-		queueURL: viper.GetString("aws.sqs.queue_url"),
+		environment: viper.GetString("environment"),
+		region:      viper.GetString("aws.sqs.region"),
+		endpoint:    viper.GetString("aws.sqs.endpoint"),
+		name:        viper.GetString("aws.sqs.name"),
 	}
+}
+
+func (c *sqsConfig) String() string {
+	return fmt.Sprintf("environment: %s, region: %s, endpoint: %s, name: %s", c.environment, c.region, c.endpoint, c.name)
 }
 
 type lineConfig struct {
@@ -88,6 +116,9 @@ func newLineConfig() *lineConfig {
 	}
 }
 
+func (c *lineConfig) String() string {
+	return fmt.Sprintf("environment: %s, webhookURL: %s", c.environment, c.webhookURL)
+}
 func readConfig(configFilePath string) error {
 	viper.SetConfigFile(configFilePath)
 	return viper.ReadInConfig()
