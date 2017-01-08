@@ -47,7 +47,7 @@ type webHandler struct {
 }
 
 func (h *webHandler) log() *logrus.Entry {
-	return h.log()
+	return h.logger.entry
 }
 
 func (h *webHandler) HandlerFunc(w http.ResponseWriter, r *http.Request) {

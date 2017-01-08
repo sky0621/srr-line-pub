@@ -15,4 +15,4 @@ log_level = "debug" # debug, info, warning, error, fatal
   queue_url = "localhost" # SQSのURL
 
 [line]
-webhook_url = "localhost" # LINEのWebhook URL
+webhook_url = "/lcl/path" # LINEのWebhook URL
