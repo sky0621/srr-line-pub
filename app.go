@@ -1,5 +1,12 @@
 package pub
 
+import (
+	"net/http"
+	"time"
+
+	"github.com/tylerb/graceful"
+)
+
 // App ...
 type App struct {
 	logger      *appLogger
@@ -47,22 +54,27 @@ func NewApp(arg *Arg) (*App, int) {
 func (a *App) Start() int {
 	a.logger.entry.Info("App will start")
 
-	e := webSetup(a.config.logger)
+	// e := webSetup(a.config.logger)
+	mux := http.NewServeMux()
+
 	handler := &webHandler{
 		logger:      a.logger,
 		config:      a.config,
 		awsHandler:  a.awsHandler,
 		lineHandler: a.lineHandler,
 	}
-	e.POST(a.config.line.webhookURL, handler.HandlerFunc)
+
+	// e.POST(a.config.line.webhookURL, handler.HandlerFunc)
+	mux.HandleFunc(a.config.line.webhookURL, handler.HandlerFunc)
 
 	a.logger.entry.Infof("Server will start at Port[%s]", a.config.server.port)
-	e.Logger.Infof("Echo Server will start at Port[%s]", a.config.server.port)
-	err := e.Start(a.config.server.port)
-	if err != nil {
-		a.logger.entry.Error("error: %#v", err)
-		return ExitCodeServerStartError
-	}
+	// e.Logger.Infof("Echo Server will start at Port[%s]", a.config.server.port)
+	// err := e.Start(a.config.server.port)
+	graceful.Run(a.config.server.port, 1*time.Second, mux)
+	// if err != nil {
+	// 	a.logger.entry.Error("error: %#v", err)
+	// 	return ExitCodeServerStartError
+	// }
 
 	return ExitCodeOK
 }
