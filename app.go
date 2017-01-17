@@ -10,31 +10,26 @@ import (
 // App ...
 type App struct {
 	logger      *appLogger
-	config      *config
+	config      *Config
 	awsHandler  awsHandlerIF
 	lineHandler lineHandlerIF
 }
 
 // NewApp ...
-func NewApp(arg *Arg) (*App, int) {
-	err := readConfig(arg.configFilePath)
-	if err != nil {
-		panic(err)
-	}
-
-	logger, err := newAppLogger(newLoggerConfig())
+func NewApp(credential *Credential, config *Config) (*App, ExitCode) {
+	logger, err := newAppLogger(config.logger)
 	if err != nil {
 		return nil, ExitCodeLogSetupError
 	}
 
-	awsHandler, err := newAwsHandler(newAwsConfig(), arg, logger)
+	awsHandler, err := newAwsHandler(config.aws, credential, logger)
 	if err != nil {
 		logger.entry.Errorf("AWS setting error %#v", err)
 		return nil, ExitCodeAwsSettingError
 	}
 	logger.entry.Info("AWS connect setting done")
 
-	lineHandler, err := newLineHandler(newLineConfig(), arg, logger)
+	lineHandler, err := newLineHandler(config.line, credential, logger)
 	if err != nil {
 		logger.entry.Error("LINE setting error: %#v", err)
 		return nil, ExitCodeLineSettingError
@@ -43,7 +38,7 @@ func NewApp(arg *Arg) (*App, int) {
 
 	app := &App{
 		logger:      logger,
-		config:      newConfig(),
+		config:      config,
 		awsHandler:  awsHandler,
 		lineHandler: lineHandler,
 	}
@@ -51,7 +46,7 @@ func NewApp(arg *Arg) (*App, int) {
 }
 
 // Start ...
-func (a *App) Start() int {
+func (a *App) Start() ExitCode {
 	a.logger.entry.Info("App will start")
 
 	mux := http.NewServeMux()

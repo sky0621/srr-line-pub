@@ -1,9 +1,8 @@
 package pub
 
 type ctx struct {
-	arg         *Arg
 	logger      *appLogger
-	config      *config
+	config      *Config
 	awsHandler  awsHandlerIF
 	lineHandler lineHandlerIF
 }

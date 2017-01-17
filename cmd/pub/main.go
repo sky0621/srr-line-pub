@@ -12,40 +12,37 @@ func main() {
 	os.Exit(realMain())
 }
 
-func realMain() (exitCode int) {
-	// treat panic
+func realMain() (exitCode pub.ExitCode) {
 	defer func() {
 		err := recover()
 		if err != nil {
 			log.Printf("Panic occured. ERR: %+v", err)
-			// FIXME 後始末
-
 		}
 	}()
 
 	return wrappedMain()
 }
 
-func wrappedMain() int {
-	arg := parseFlag()
-	app, exitCode := pub.NewApp(arg)
+func wrappedMain() pub.ExitCode {
+	f := flag.String("f", "../config.toml", "Config File Fullpath")
+	flag.Parse()
+
+	// Viperグローバル持ち
+	err := pub.ReadConfig(f)
+	if err != nil {
+		panic(err)
+	}
+
+	app, exitCode := pub.NewApp(&pub.Credential{
+		LineAccessToken:    os.Getenv("LINE_ACCESS_TOKEN"),
+		LineChannelSecret:  os.Getenv("LINE_CHANNEL_SECRET"),
+		AwsAccessKeyID:     os.Getenv("AWS_ACCESS_KEY_ID"),
+		AwsSecretAccessKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
+	}, pub.NewConfig())
 	if exitCode > pub.ExitCodeOK {
 		return exitCode
 	}
 	defer app.Close()
 
 	return app.Start()
-}
-
-func parseFlag() *pub.Arg {
-	f := flag.String("f", "./config.toml", "Config File Fullpath")
-	// AWS
-	ak := flag.String("ak", "accessKeyId", "AWS AdcessKeyId")
-	as := flag.String("as", "secretAccessKey", "AWS SecretAccessKey")
-	// LINE-API
-	ls := flag.String("ls", "channelSecret", "LINE ChannelSecret")
-	lt := flag.String("lt", "accessToken", "LINE AccessToken")
-	flag.Parse()
-	arg := pub.NewArg(*f, *ak, *as, *ls, *lt)
-	return arg
 }

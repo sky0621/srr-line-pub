@@ -24,19 +24,19 @@ type lineHandler struct {
 	logger *appLogger
 }
 
-func newLineHandler(cfg *lineConfig, arg *Arg, logger *appLogger) (lineHandlerIF, error) {
+func newLineHandler(cfg *lineConfig, credential *Credential, logger *appLogger) (lineHandlerIF, error) {
 	if cfg.environment == constEnvLocal {
 		return &lineHandlerMock{}, nil
 	}
 
-	cli, err := linebot.New(arg.lineChannelSecret, arg.lineAccessToken)
+	cli, err := linebot.New(credential.LineChannelSecret, credential.LineAccessToken)
 	if err != nil {
 		return nil, err
 	}
 	return &lineHandler{
 		client: cli,
-		token:  arg.lineAccessToken,
-		secret: arg.lineChannelSecret,
+		token:  credential.LineAccessToken,
+		secret: credential.LineChannelSecret,
 		logger: logger,
 	}, nil
 }

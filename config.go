@@ -6,7 +6,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-type config struct {
+// Config ...
+type Config struct {
 	environment string
 	appName     string
 	server      *serverConfig
@@ -15,8 +16,9 @@ type config struct {
 	line        *lineConfig
 }
 
-func newConfig() *config {
-	return &config{
+// NewConfig ...
+func NewConfig() *Config {
+	return &Config{
 		environment: viper.GetString("environment"),
 		appName:     viper.GetString("app_name"),
 		server:      newServerConfig(),
@@ -26,7 +28,7 @@ func newConfig() *config {
 	}
 }
 
-func (c *config) String() string {
+func (c *Config) String() string {
 	return fmt.Sprintf("environment: %s, appName: %s, server: %s, logger: %s, aws: %s, line: %s", c.environment, c.appName, c.server.String(), c.logger.String(), c.aws.String(), c.line.String())
 }
 
@@ -119,7 +121,9 @@ func newLineConfig() *lineConfig {
 func (c *lineConfig) String() string {
 	return fmt.Sprintf("environment: %s, webhookURL: %s", c.environment, c.webhookURL)
 }
-func readConfig(configFilePath string) error {
+
+// ReadConfig ...
+func ReadConfig(configFilePath string) error {
 	viper.SetConfigFile(configFilePath)
 	return viper.ReadInConfig()
 }

@@ -10,7 +10,7 @@ import (
 
 type webHandler struct {
 	logger      *appLogger
-	config      *config
+	config      *Config
 	awsHandler  awsHandlerIF
 	lineHandler lineHandlerIF
 }
