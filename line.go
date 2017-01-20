@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
@@ -21,10 +22,9 @@ type lineHandler struct {
 	client *linebot.Client
 	token  string
 	secret string
-	logger *appLogger
 }
 
-func newLineHandler(cfg *lineConfig, credential *Credential, logger *appLogger) (lineHandlerIF, error) {
+func newLineHandler(cfg *lineConfig, credential *Credential) (lineHandlerIF, error) {
 	if cfg.environment == constEnvLocal {
 		return &lineHandlerMock{}, nil
 	}
@@ -37,7 +37,6 @@ func newLineHandler(cfg *lineConfig, credential *Credential, logger *appLogger) 
 		client: cli,
 		token:  credential.LineAccessToken,
 		secret: credential.LineChannelSecret,
-		logger: logger,
 	}, nil
 }
 
@@ -52,7 +51,7 @@ func (h *lineHandler) parseRequest(r *http.Request) ([]linebot.Event, error) {
 		return nil, err
 	}
 	if !h.validateSignature(r.Header.Get("X-LINE-Signature"), body) {
-		h.logger.entry.Warn(r.Header.Get("X-LINE-Signature"))
+		logrus.Warn(r.Header.Get("X-LINE-Signature"))
 	}
 
 	request := &struct {
@@ -69,10 +68,10 @@ func (h *lineHandler) validateSignature(signature string, body []byte) bool {
 	if err != nil {
 		return false
 	}
-	h.logger.entry.Debug("##### validateSignature #####")
-	h.logger.entry.Debug(decoded)
+	logrus.Debug("##### validateSignature #####")
+	logrus.Debug(decoded)
 	hash := hmac.New(sha256.New, []byte(h.secret))
 	hash.Write(body)
-	h.logger.entry.Debug(hash)
+	logrus.Debug(hash)
 	return hmac.Equal(decoded, hash.Sum(nil))
 }

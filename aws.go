@@ -9,19 +9,15 @@ type awsHandlerIF interface {
 type awsHandler struct {
 	session    *session.Session
 	sqsHandler sqsHandlerIF
-	logger     *appLogger
 }
 
-func newAwsHandler(cfg *awsConfig, credential *Credential, logger *appLogger) (awsHandlerIF, error) {
-	sqsHandler, err := newSqsHandler(cfg.sqs, credential, logger)
+func newAwsHandler(cfg *awsConfig, credential *Credential) (awsHandlerIF, error) {
+	sqsHandler, err := newSqsHandler(cfg.sqs, credential)
 	if err != nil {
 		return nil, err
 	}
 
-	return &awsHandler{
-		sqsHandler: sqsHandler,
-		logger:     logger,
-	}, nil
+	return &awsHandler{sqsHandler: sqsHandler}, nil
 }
 
 func (h *awsHandler) getSqsHandler() sqsHandlerIF {

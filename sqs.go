@@ -1,6 +1,7 @@
 package pub
 
 import (
+	"github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -12,12 +13,11 @@ type sqsHandlerIF interface {
 }
 
 type sqsHandler struct {
-	cfg    *sqsConfig
-	cli    *sqs.SQS
-	logger *appLogger
+	cfg *sqsConfig
+	cli *sqs.SQS
 }
 
-func newSqsHandler(cfg *sqsConfig, credential *Credential, logger *appLogger) (sqsHandlerIF, error) {
+func newSqsHandler(cfg *sqsConfig, credential *Credential) (sqsHandlerIF, error) {
 	if cfg.environment == constEnvLocal {
 		return &sqsHandlerMock{}, nil
 	}
@@ -36,9 +36,8 @@ func newSqsHandler(cfg *sqsConfig, credential *Credential, logger *appLogger) (s
 	cli := sqs.New(sess)
 
 	return &sqsHandler{
-		cfg:    cfg,
-		cli:    cli,
-		logger: logger,
+		cfg: cfg,
+		cli: cli,
 	}, nil
 }
 
@@ -46,7 +45,7 @@ func (h *sqsHandler) sendMessage(body string) (*sqs.SendMessageOutput, error) {
 	getInput := &sqs.GetQueueUrlInput{QueueName: aws.String(h.cfg.name)}
 	gquRes, err := h.cli.GetQueueUrl(getInput)
 	if err != nil {
-		h.logger.entry.Errorf("GetQueueUrl: %#v", err)
+		logrus.Errorf("GetQueueUrl: %#v", err)
 		return nil, err
 	}
 
@@ -56,7 +55,7 @@ func (h *sqsHandler) sendMessage(body string) (*sqs.SendMessageOutput, error) {
 	}
 	output, err := h.cli.SendMessage(input)
 	if err != nil {
-		h.logger.entry.Errorf("SendMessage: %#v", err)
+		logrus.Errorf("SendMessage: %#v", err)
 		return nil, err
 	}
 	return output, nil
