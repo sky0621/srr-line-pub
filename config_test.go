@@ -2,7 +2,7 @@ package pub
 
 import "testing"
 
-var expected = &config{
+var expected = &Config{
 	environment: "local",
 	appName:     "srr-line-pub",
 	server: &serverConfig{
@@ -35,8 +35,8 @@ var expected = &config{
 }
 
 func TestNewConfig(t *testing.T) {
-	readConfig("./cmd/pub/config.toml")
-	actual := newConfig()
+	ReadConfig("./cmd/config.toml")
+	actual := NewConfig()
 	if expected.String() != actual.String() {
 		t.Errorf("\nExpect is %#v\nActual is %#v", expected.String(), actual.String())
 	}
