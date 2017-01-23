@@ -26,12 +26,6 @@ func realMain() (exitCode pub.ExitCode) {
 }
 
 func wrappedMain() pub.ExitCode {
-	credentials := setup()
-	app, exitCode := pub.NewApp(credentials, pub.NewConfig())
-	if exitCode > pub.ExitCodeOK {
-		return exitCode
-	}
-	defer app.Close()
-
-	return app.Start()
+	credential, config := setup()
+	return app.Start(credential, config)
 }

@@ -7,6 +7,7 @@ const (
 	ExitCodeArgsError
 	ExitCodeLogSetupError
 	ExitCodeConfigError
+	ExitCodeCtxError
 	ExitCodeAwsSettingError
 	ExitCodeLineSettingError
 	ExitCodeServerStartError
