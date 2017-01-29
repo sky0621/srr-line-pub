@@ -9,7 +9,6 @@ import (
 )
 
 type webHandler struct {
-	config      *Config
 	awsHandler  awsHandlerIF
 	lineHandler lineHandlerIF
 }

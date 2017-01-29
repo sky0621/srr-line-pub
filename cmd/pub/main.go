@@ -27,5 +27,11 @@ func realMain() (exitCode pub.ExitCode) {
 
 func wrappedMain() pub.ExitCode {
 	credential, config := setup()
-	return app.Start(credential, config)
+	ctx, err := pub.NewCtx(credential, config)
+	if err != nil {
+		logrus.Errorf("[wrappedMain][call NewCtx()] %#v\n", err)
+		return ExitCodeCtxError
+	}
+
+	return pub.StartApp(credential, config)
 }
