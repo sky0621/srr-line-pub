@@ -20,6 +20,9 @@ func AwsSetting(awsConfig *awsConfig, credential *Credential) CtxSetting {
 	}
 }
 
+// CtxOption ...
+type CtxOption func(ctx *Ctx) error
+
 // NewCtx ...
 func NewCtx(credential *Credential, config *Config) (*Ctx, error) {
 	awsHandler, err := newAwsHandler(config.aws, credential)
