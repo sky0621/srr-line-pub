@@ -2,6 +2,7 @@ package global
 
 import (
 	"github.com/Sirupsen/logrus"
+	"io"
 )
 
 // Level ...
@@ -42,10 +43,24 @@ func WithSilent(silent bool) Option {
 }
 
 // WithLevel
-// FIXME
+func WithLevel(level string) Option {
+	return func(log *Logger) error {
+		lvl, err := logrus.ParseLevel(level)
+		if err != nil {
+			return err
+		}
+		logrus.SetLevel(lvl)
+		return nil
+	}
+}
 
 // WithOutput
-// FIXME
+func WithOutput(out io.Writer) Option {
+	return func(log *Logger) error {
+		logrus.SetOutput(out)
+		return nil
+	}
+}
 
 // NewLogger ...
 func NewLogger(appName string, options ...Option) (*Logger, error) {
@@ -72,18 +87,36 @@ func NewLogger(appName string, options ...Option) (*Logger, error) {
 
 	logrus.SetFormatter(&logrus.JSONFormatter{TimestampFormat: "2017-02-08 01:28:00"})
 
+	for _, option := range options {
+		err := option(log)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return log, nil
 }
 
 // WithFields ...
-// FIXME
+func (l *Logger) WithFields(fields map[string]interface{}) {
+	if l == nil {
+		return
+	}
+	l.entry = l.entry.WithFields(fields)
+}
 
 // Log ...
 func (l *Logger) Log(level Level, args ...interface{}) {
+	if l == nil {
+		return
+	}
 	l.levelFuncMap[level](args...)
 }
 
 // Logf ...
 func (l *Logger) Logf(level Level, format string, args ...interface{}) {
+	if l == nil {
+		return
+	}
 	l.levelFuncfMap[level](format, args...)
 }
