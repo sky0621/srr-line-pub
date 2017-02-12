@@ -5,11 +5,12 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/sky0621/srr-line-pub/static"
 	"github.com/tylerb/graceful"
 )
 
 // StartApp ...
-func StartApp(ctx *Ctx) ExitCode {
+func StartApp(ctx *Ctx) static.ExitCode {
 	logrus.Info("App will start")
 
 	mux := http.NewServeMux()
@@ -25,5 +26,5 @@ func StartApp(ctx *Ctx) ExitCode {
 	graceful.Run(ctx.config.server.port, 1*time.Second, mux)
 	logrus.Infof("Server stop at Port[%s]", ctx.config.server.port)
 
-	return ExitCodeOK
+	return static.ExitCodeOK
 }

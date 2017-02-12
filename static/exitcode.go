@@ -1,4 +1,4 @@
-package pub
+package static
 
 type ExitCode int
 
