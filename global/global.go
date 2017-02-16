@@ -1,3 +1,3 @@
 package global
 
-var Log *Logger
+var L *Logger

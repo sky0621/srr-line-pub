@@ -20,8 +20,7 @@ func setup() (*pub.Credential, *pub.Config) {
 
 	cfg := pub.NewConfig()
 
-	//
-	global.Log, err = global.NewLogger("srr-line-pub")
+	global.L, err = global.NewLogger("srr-line-pub")
 	if err != nil {
 		panic(err)
 	}
