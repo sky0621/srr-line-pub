@@ -1,19 +1,21 @@
 package: github.com/sky0621/srr-line-pub
 import:
 - package: github.com/Sirupsen/logrus
-  version: ^0.11.0
+  version: ~0.11.2
 - package: github.com/aws/aws-sdk-go
-  version: ^1.6.9
+  version: ~1.6.25
   subpackages:
   - aws
+  - aws/credentials
   - aws/session
   - service/sqs
-- package: github.com/labstack/echo
-  version: ^3.0.3
-  subpackages:
-  - middleware
 - package: github.com/line/line-bot-sdk-go
-  version: ^1.0.0
+  version: ~1.0.0
   subpackages:
   - linebot
+- package: github.com/sky0621/go-lib
+  subpackages:
+  - log
 - package: github.com/spf13/viper
+- package: github.com/tylerb/graceful
+  version: ~1.2.15

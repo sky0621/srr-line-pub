@@ -1,8 +1,8 @@
-hash: cf99e0e63545de4c5744deffe99fbbd8b575aa1aa433c2a3e10ea838e96c998a
-updated: 2016-12-31T07:29:04.681902+09:00
+hash: 78c94fe3e7b8a3bf9fc9a50272b4d23eef97a7657281508bd4f2aa04a0f72633
+updated: 2017-02-20T02:38:16.6267334+09:00
 imports:
 - name: github.com/aws/aws-sdk-go
-  version: 36670f6ab1769ad77fa5f7e2c194398733503635
+  version: b2852089fcfd0794d25d57f193e15121ab8a6d9e
   subpackages:
   - aws
   - aws/awserr
@@ -27,8 +27,6 @@ imports:
   - private/protocol/xml/xmlutil
   - service/sqs
   - service/sts
-- name: github.com/dgrijalva/jwt-go
-  version: 9ed569b5d1ac936e6494082958d63a6aa4fff99a
 - name: github.com/fsnotify/fsnotify
   version: fd9ec7deca8bf46ecd2a795baaacf2b3a9be1197
 - name: github.com/go-ini/ini
@@ -46,27 +44,12 @@ imports:
   - json/token
 - name: github.com/jmespath/go-jmespath
   version: bd40a432e4c76585ef6b72d3fd96fb9b6dc7b68d
-- name: github.com/labstack/echo
-  version: 8d504c1b699c757b267255c53b3e5219f9974abc
-  subpackages:
-  - middleware
-- name: github.com/labstack/gommon
-  version: b2765095a572012ea4828c9596fefd824c2aee72
-  subpackages:
-  - bytes
-  - color
-  - log
-  - random
 - name: github.com/line/line-bot-sdk-go
   version: 3a7d66f5efce6ac202f650134609f9d6d163a640
   subpackages:
   - linebot
 - name: github.com/magiconair/properties
   version: 9c47895dc1ce54302908ab8a43385d1f5df2c11c
-- name: github.com/mattn/go-colorable
-  version: d228849504861217f796da67fae4f6e347643f15
-- name: github.com/mattn/go-isatty
-  version: 30a891c33c7cde7b02a981314b4228ec99380cca
 - name: github.com/mitchellh/mapstructure
   version: bfdb1a85537d60bc7e954e600c250219ea497417
 - name: github.com/pelletier/go-buffruneio
@@ -74,7 +57,11 @@ imports:
 - name: github.com/pelletier/go-toml
   version: 017119f7a78a0b5fc0ea39ef6be09f03acf3345d
 - name: github.com/Sirupsen/logrus
-  version: d26492970760ca5d33129d2d799e34be5c4782eb
+  version: c078b1e43f58d563c74cebe63c85789e76ddb627
+- name: github.com/sky0621/go-lib
+  version: e6fc992746ce823bc913198ebd0007fdcb5adbe7
+  subpackages:
+  - log
 - name: github.com/spf13/afero
   version: 2f30b2a92c0e5700bcfe4715891adb1f2a7a406d
   subpackages:
@@ -88,14 +75,7 @@ imports:
 - name: github.com/spf13/viper
   version: 5ed0fc31f7f453625df314d8e66b9791e8d13003
 - name: github.com/tylerb/graceful
-  version: 4df1190835320af7076dfcf27b3d071fd3612caf
-- name: github.com/valyala/fasttemplate
-  version: 3b874956e03f1636d171bda64b130f9135f42cff
-- name: golang.org/x/crypto
-  version: f6b343c37ca80bfa8ea539da67a0b621f84fab1d
-  subpackages:
-  - acme
-  - acme/autocert
+  version: 4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb
 - name: golang.org/x/net
   version: 45e771701b814666a7eb299e6c7a57d0b1799e91
   subpackages:
