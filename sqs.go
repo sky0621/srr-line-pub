@@ -1,11 +1,12 @@
 package pub
 
 import (
-	"github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/sky0621/go-lib/log"
+	"github.com/sky0621/srr-line-pub/global"
 	"github.com/sky0621/srr-line-pub/static"
 )
 
@@ -46,7 +47,7 @@ func (h *sqsHandler) sendMessage(body string) (*sqs.SendMessageOutput, error) {
 	getInput := &sqs.GetQueueUrlInput{QueueName: aws.String(h.cfg.name)}
 	gquRes, err := h.cli.GetQueueUrl(getInput)
 	if err != nil {
-		logrus.Errorf("GetQueueUrl: %#v", err)
+		global.L.Logf(log.E, "GetQueueUrl: %#v", err)
 		return nil, err
 	}
 
@@ -56,7 +57,7 @@ func (h *sqsHandler) sendMessage(body string) (*sqs.SendMessageOutput, error) {
 	}
 	output, err := h.cli.SendMessage(input)
 	if err != nil {
-		logrus.Errorf("SendMessage: %#v", err)
+		global.L.Logf(log.E, "SendMessage: %#v", err)
 		return nil, err
 	}
 	return output, nil

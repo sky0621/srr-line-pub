@@ -8,8 +8,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/line/line-bot-sdk-go/linebot"
+	"github.com/sky0621/go-lib/log"
+	"github.com/sky0621/srr-line-pub/global"
 	"github.com/sky0621/srr-line-pub/static"
 )
 
@@ -52,7 +53,7 @@ func (h *lineHandler) parseRequest(r *http.Request) ([]linebot.Event, error) {
 		return nil, err
 	}
 	if !h.validateSignature(r.Header.Get("X-LINE-Signature"), body) {
-		logrus.Warn(r.Header.Get("X-LINE-Signature"))
+		global.L.Log(log.W, r.Header.Get("X-LINE-Signature"))
 	}
 
 	request := &struct {
@@ -69,10 +70,10 @@ func (h *lineHandler) validateSignature(signature string, body []byte) bool {
 	if err != nil {
 		return false
 	}
-	logrus.Debug("##### validateSignature #####")
-	logrus.Debug(decoded)
+	global.L.Log(log.D, "##### validateSignature #####")
+	global.L.Log(log.D, decoded)
 	hash := hmac.New(sha256.New, []byte(h.secret))
 	hash.Write(body)
-	logrus.Debug(hash)
+	global.L.Log(log.D, hash)
 	return hmac.Equal(decoded, hash.Sum(nil))
 }

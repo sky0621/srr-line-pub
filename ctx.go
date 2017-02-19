@@ -1,6 +1,9 @@
 package pub
 
-import "github.com/Sirupsen/logrus"
+import (
+	"github.com/sky0621/go-lib/log"
+	"github.com/sky0621/srr-line-pub/global"
+)
 
 // Ctx ...
 type Ctx struct {
@@ -27,17 +30,17 @@ type CtxOption func(ctx *Ctx) error
 func NewCtx(credential *Credential, config *Config) (*Ctx, error) {
 	awsHandler, err := newAwsHandler(config.aws, credential)
 	if err != nil {
-		logrus.Errorf("AWS setting error %#v", err)
+		global.L.Logf(log.E, "AWS setting error %#v", err)
 		return nil, err
 	}
-	logrus.Info("AWS connect setting done")
+	global.L.Log(log.I, "AWS connect setting done")
 
 	lineHandler, err := newLineHandler(config.line, credential)
 	if err != nil {
-		logrus.Errorf("LINE setting error: %#v", err)
+		global.L.Logf(log.E, "LINE setting error: %#v", err)
 		return nil, err
 	}
-	logrus.Info("LINE connect setting done")
+	global.L.Log(log.I, "LINE connect setting done")
 
 	return &Ctx{
 		config:      config,

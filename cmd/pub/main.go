@@ -6,12 +6,10 @@ import (
 	"github.com/Sirupsen/logrus"
 	pub "github.com/sky0621/srr-line-pub"
 	"github.com/sky0621/srr-line-pub/static"
-	"github.com/uber-go/zap"
 )
 
 func main() {
 	code := realMain()
-	zap.Logger.Info("ExitCode", zap.Int("code", 1))
 	logrus.Infof("ExitCode: %v", code)
 	os.Exit(int(code))
 }

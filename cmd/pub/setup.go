@@ -4,8 +4,8 @@ import (
 	"flag"
 	"os"
 
+	"github.com/sky0621/go-lib/log"
 	pub "github.com/sky0621/srr-line-pub"
-	"github.com/sky0621/srr-line-pub/global"
 )
 
 func setup() (*pub.Credential, *pub.Config) {
@@ -20,7 +20,7 @@ func setup() (*pub.Credential, *pub.Config) {
 
 	cfg := pub.NewConfig()
 
-	global.L, err = global.NewLogger("srr-line-pub")
+	log.L, err = log.NewLogger("srr-line-pub")
 	if err != nil {
 		panic(err)
 	}
