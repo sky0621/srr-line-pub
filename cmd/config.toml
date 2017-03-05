@@ -1,13 +1,11 @@
-environment = "local"
-app_name = "srr-line-pub"
-
 [server]
 host = "localhost"  # your server
 port = ":8080"  # your server port
 
 [logger]
+app_name = "srr-line-pub"
 filepath = "./srr-line-pub.log" # log file fullpath
-log_level = "debug" # debug, info, warning, error, fatal
+log_level = "debug" # debug, info, warning, error, fatal, panic
 
 [aws]
   [aws.sqs]

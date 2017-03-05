@@ -11,7 +11,6 @@ import (
 	"github.com/line/line-bot-sdk-go/linebot"
 	"github.com/sky0621/go-lib/log"
 	"github.com/sky0621/srr-line-pub/global"
-	"github.com/sky0621/srr-line-pub/static"
 )
 
 type lineHandlerIF interface {
@@ -27,10 +26,6 @@ type lineHandler struct {
 }
 
 func newLineHandler(cfg *lineConfig, credential *Credential) (lineHandlerIF, error) {
-	if cfg.environment == static.ConstEnvLocal {
-		return &lineHandlerMock{}, nil
-	}
-
 	cli, err := linebot.New(credential.LineChannelSecret, credential.LineAccessToken)
 	if err != nil {
 		return nil, err

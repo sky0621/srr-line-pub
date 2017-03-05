@@ -1,8 +1,8 @@
 hash: 78c94fe3e7b8a3bf9fc9a50272b4d23eef97a7657281508bd4f2aa04a0f72633
-updated: 2017-02-20T02:38:16.6267334+09:00
+updated: 2017-03-06T00:25:52.2001669+09:00
 imports:
 - name: github.com/aws/aws-sdk-go
-  version: b2852089fcfd0794d25d57f193e15121ab8a6d9e
+  version: 00fb2125993965df739fa3398b03bef3eb2e198f
   subpackages:
   - aws
   - aws/awserr
@@ -57,9 +57,9 @@ imports:
 - name: github.com/pelletier/go-toml
   version: 017119f7a78a0b5fc0ea39ef6be09f03acf3345d
 - name: github.com/Sirupsen/logrus
-  version: c078b1e43f58d563c74cebe63c85789e76ddb627
+  version: 0208149b40d863d2c1a2f8fe5753096a9cf2cc8b
 - name: github.com/sky0621/go-lib
-  version: e6fc992746ce823bc913198ebd0007fdcb5adbe7
+  version: d1b6c9f1125107b0f550885fed9cc707239c0bf9
   subpackages:
   - log
 - name: github.com/spf13/afero

@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/sky0621/go-lib/log"
 	"github.com/sky0621/srr-line-pub/global"
-	"github.com/sky0621/srr-line-pub/static"
 )
 
 type sqsHandlerIF interface {
@@ -20,10 +19,6 @@ type sqsHandler struct {
 }
 
 func newSqsHandler(cfg *sqsConfig, credential *Credential) (sqsHandlerIF, error) {
-	if cfg.environment == static.ConstEnvLocal {
-		return &sqsHandlerMock{}, nil
-	}
-
 	awsCfg := &aws.Config{
 		Credentials: credentials.NewStaticCredentials(credential.AwsAccessKeyID, credential.AwsSecretAccessKey, ""),
 		Region:      aws.String(cfg.region),
